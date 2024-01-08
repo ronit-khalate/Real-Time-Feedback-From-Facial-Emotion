@@ -3,11 +3,21 @@ package com.example.facial_feedback_app.presentation.camera
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
+import android.os.Build
 import android.util.Log
+import android.util.Range
+import androidx.annotation.RequiresApi
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCapture.OutputFileOptions
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
+import androidx.camera.video.FileOutputOptions
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoCapture
+import androidx.camera.video.VideoRecordEvent
+import androidx.camera.video.impl.VideoCaptureConfig
 import androidx.camera.view.LifecycleCameraController
+import androidx.camera.view.video.AudioConfig
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,10 +34,11 @@ import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 
 @HiltViewModel
 class CameraViewModel @Inject constructor(
-        private val mlKitFaceDetector: MlKitFaceDetector
+        val mlKitFaceDetector: MlKitFaceDetector
 ):ViewModel() {
 
 
@@ -42,6 +53,12 @@ class CameraViewModel @Inject constructor(
     var bitmaps = _bitmaps.asStateFlow()
 
     var loading by mutableStateOf(false)
+
+    fun addFaces(faces:List<Bitmap>){
+        _bitmaps.value+=faces
+    }
+
+    var recording:Recording?=null
 
 
     fun takePhoto(
@@ -60,29 +77,9 @@ class CameraViewModel @Inject constructor(
 
                     override fun onCaptureSuccess(image: ImageProxy) {
                         super.onCaptureSuccess(image)
-                        Log.e("cap",image.toString())
-                        val matrix = Matrix().apply {
-                            postRotate(image.imageInfo.rotationDegrees.toFloat())
-
-                        }
-                        val rotatedBitmap =Bitmap.createBitmap(
-                                image.toBitmap(),
-                                0,
-                                0,
-                                image.width,
-                                image.height,
-                                matrix,
-                                true
-                        )
-                        //* Passing Captured Image To FaceDetector
-
-
-                        mlKitFaceDetector.getFacesFromCapturedImage(rotatedBitmap){faceList->
-                            
-                            _bitmaps.value+=faceList
-                        }
-
+                        Log.e("CameraSuccess",image.toString())
                     }
+
                 }
         )
     }
@@ -96,6 +93,8 @@ class CameraViewModel @Inject constructor(
             is CameraModeState.Video->{
                 if(cameraModeState.recordingState is RecordingState.Started){
                     cameraModeState = CameraModeState.Video( RecordingState.Stopped)
+                    recording?.close()
+                    recording=null
 
                 }
                 else{
@@ -111,7 +110,6 @@ class CameraViewModel @Inject constructor(
             }
         }
     }
-
     fun changeCameraMode(){
 
         cameraModeState = when(cameraModeState){
@@ -126,16 +124,35 @@ class CameraViewModel @Inject constructor(
         }
     }
 
+
     private fun recordVideo(controller: LifecycleCameraController,applicationContext: Context){
 
-        viewModelScope.launch(Dispatchers.Default){
+        /*
+        *
+        * */
+       recording= controller.startRecording(
+                FileOutputOptions.Builder(File(applicationContext.filesDir,"feedback.mp4")).build(),
+                AudioConfig.AUDIO_DISABLED,
+                ContextCompat.getMainExecutor(applicationContext)
+        ){videoRecordEvent->
 
-            while (cameraModeState.recordingState is RecordingState.Started){
+           Log.d("record",videoRecordEvent.recordingStats.toString())
+            when(videoRecordEvent){
+                is VideoRecordEvent.Finalize->{
+                    if(videoRecordEvent.hasError()){
 
-                takePhoto(controller=controller,applicationContext=applicationContext)
-                delay(500L)
+                        recording?.close()
+                        recording=null
+
+
+                    }
+                }
+
+
             }
+
         }
+
     }
 
 }
