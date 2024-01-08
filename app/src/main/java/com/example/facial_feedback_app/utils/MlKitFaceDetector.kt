@@ -28,7 +28,8 @@ class MlKitFaceDetector @Inject constructor() {
     ){
 
         val image = InputImage.fromBitmap(bitmap, 0)
-        var facesList:MutableList<Bitmap> = mutableListOf()
+        var faceBitmapList:MutableList<Bitmap> = mutableListOf()
+        var facesList:MutableList<Face> = mutableListOf()
         mlKitFaceDetector.process(image)
             .addOnSuccessListener { faces->
                 Log.d("Success", "${faces.size}")
@@ -45,13 +46,15 @@ class MlKitFaceDetector @Inject constructor() {
                     // Create a new Bitmap with the corrected dimensions
                     if (width > 0 && height > 0) {
                         val croppedFace = Bitmap.createBitmap(bitmap, x, y, width, height)
-                        facesList.add(croppedFace.toGrayscale().resize(100,100))
+                        faceBitmapList.add(croppedFace.toGrayscale().resize(100,100))
+                        facesList.add(face)
                     }
 
 
                 }
 
-                addFaceToList(facesList,faces)
+                addFaceToList(faceBitmapList.toList(),facesList.toList())
+                faceBitmapList.clear()
                 facesList.clear()
 
 
