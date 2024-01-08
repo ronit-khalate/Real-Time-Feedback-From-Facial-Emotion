@@ -4,7 +4,9 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.Matrix
 import android.graphics.Paint
+import androidx.camera.core.ImageProxy
 
 fun Bitmap.toGrayscale(): Bitmap {
     val width = this.width
@@ -28,4 +30,19 @@ fun Bitmap.toGrayscale(): Bitmap {
 fun Bitmap.resize(x:Int,y:Int): Bitmap {
 
     return Bitmap.createScaledBitmap(this, x, y, false)
+}
+
+fun ImageProxy.toRotatedBitmap():Bitmap{
+    val matrix = Matrix().apply {
+        postRotate(this@toRotatedBitmap.imageInfo.rotationDegrees.toFloat())
+    }
+
+    return Bitmap.createBitmap(
+            this.toBitmap(),
+            0,
+            0,
+            this.width,
+            this.height,
+            matrix,true
+    )
 }
