@@ -2,6 +2,8 @@ package com.example.facial_feedback_app.presentation.camera
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
+import android.util.Range
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.impl.ImageAnalysisConfig
@@ -56,8 +58,10 @@ import com.example.facial_feedback_app.presentation.MainViewModel
 import com.example.facial_feedback_app.presentation.camera.state.CameraModeState
 import com.example.facial_feedback_app.presentation.camera.state.RecordingState
 import com.example.facial_feedback_app.presentation.utils.CameraPreview
+import com.example.facial_feedback_app.utils.toRotatedBitmap
 import com.google.mlkit.vision.face.Face
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.Executors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,35 +71,46 @@ fun CameraScreen(
 ){
 
     val context= LocalContext.current
-    val controller = remember{
-
-        val imageAnalysis = ImageAnalysis.Builder()
-            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-            .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888)
-            .build()
-
-
+    val lifecycleOwner= LocalLifecycleOwner.current
+    val cameraController = remember{
 
 
         LifecycleCameraController(context).apply {
-           setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context), ImageAnalysis.Analyzer { image: ImageProxy ->
-
-
-
-           })
-
+            // setting frame rated
+            videoCaptureTargetFrameRate= Range(5,10)
             setEnabledUseCases(
                     CameraController.IMAGE_CAPTURE or
                     CameraController.VIDEO_CAPTURE or
                     CameraController.IMAGE_ANALYSIS
             )
 
+
         }
     }
 
 
+    cameraController.bindToLifecycle(lifecycleOwner)
 
 
+
+
+
+
+    cameraController.setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context)){imageProxy:ImageProxy->
+
+        Log.d("recording",cameraController.isRecording.toString())
+        if(viewmodel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
+
+            viewmodel.mlKitFaceDetector.getFacesFromCapturedImage(imageProxy.toRotatedBitmap()){
+
+                viewmodel.addFaces(it)
+
+
+            }
+        }
+        imageProxy.close()
+
+    }
 
 
 
@@ -104,7 +119,7 @@ fun CameraScreen(
                 .fillMaxSize()
     ){
 
-        CameraPreview(controller =controller,Modifier.fillMaxSize() )
+        CameraPreview(controller =cameraController,Modifier.fillMaxSize() )
         
         
         Row(
@@ -172,8 +187,8 @@ fun CameraScreen(
                                     .clickable {
 
                                         viewmodel.onStart(
-                                                controller = controller,
-                                                applicationContext = applicationContext
+                                                controller = cameraController,
+                                                applicationContext = context
                                         )
 
                                     },
