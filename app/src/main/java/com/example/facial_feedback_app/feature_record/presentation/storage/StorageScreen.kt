@@ -1,4 +1,4 @@
-package com.example.facial_feedback_app.presentation.storage
+package com.example.facial_feedback_app.feature_record.presentation.storage
 
 import android.graphics.Bitmap
 import android.util.Log
@@ -15,7 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.facial_feedback_app.presentation.camera.CameraViewModel
+import com.example.facial_feedback_app.feature_record.presentation.camera.CameraViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 

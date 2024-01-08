@@ -1,38 +1,24 @@
 package com.example.facial_feedback_app
 
-import android.graphics.Bitmap
-import android.graphics.Matrix
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.camera.core.ImageCapture.OnImageCapturedCallback
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
-import androidx.camera.view.CameraController
-import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.facial_feedback_app.presentation.BottomNavItem
-import com.example.facial_feedback_app.presentation.MainViewModel
-import com.example.facial_feedback_app.presentation.utils.BottomNavigationBar
-import com.example.facial_feedback_app.presentation.camera.CameraScreen
-import com.example.facial_feedback_app.presentation.camera.CameraViewModel
-import com.example.facial_feedback_app.presentation.storage.StorageReview
-import com.example.facial_feedback_app.presentation.utils.PermissionManager
+import com.example.facial_feedback_app.feature_record.presentation.BottomNavItem
+import com.example.facial_feedback_app.feature_record.presentation.utils.BottomNavigationBar
+import com.example.facial_feedback_app.feature_record.presentation.camera.CameraScreen
+import com.example.facial_feedback_app.feature_record.presentation.camera.CameraViewModel
+import com.example.facial_feedback_app.feature_record.presentation.storage.StorageReview
+import com.example.facial_feedback_app.core.permissions.PermissionManager
 import com.example.facial_feedback_app.ui.theme.FacialFeedbackTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -55,7 +41,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             FacialFeedbackTheme {
-                val cameraViewModel:CameraViewModel= hiltViewModel()
+                val cameraViewModel: CameraViewModel = hiltViewModel()
                 val navController = rememberNavController()
 
 

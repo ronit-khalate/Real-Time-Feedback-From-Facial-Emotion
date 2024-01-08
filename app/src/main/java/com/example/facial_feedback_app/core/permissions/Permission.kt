@@ -1,4 +1,4 @@
-package com.example.facial_feedback_app.presentation.utils
+package com.example.facial_feedback_app.core.permissions
 
 import android.Manifest
 import android.content.Context

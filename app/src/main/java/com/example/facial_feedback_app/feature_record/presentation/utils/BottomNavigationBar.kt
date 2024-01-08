@@ -1,4 +1,4 @@
-package com.example.facial_feedback_app.presentation.utils
+package com.example.facial_feedback_app.feature_record.presentation.utils
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Icon
@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import com.example.facial_feedback_app.presentation.BottomNavItem
+import com.example.facial_feedback_app.feature_record.presentation.BottomNavItem
 
 
 @Composable
@@ -46,7 +46,7 @@ fun BottomNavigationBar(
                selected = selected is BottomNavItem.storage,
                onClick = {
                    onStorageClick()
-                   selected =BottomNavItem.storage
+                   selected = BottomNavItem.storage
                          },
                icon = { Icon(imageVector = ImageVector.vectorResource(id = BottomNavItem.storage.icon), contentDescription = "")})
    }

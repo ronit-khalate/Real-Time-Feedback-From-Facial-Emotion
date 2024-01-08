@@ -1,4 +1,4 @@
-package com.example.facial_feedback_app.presentation.camera
+package com.example.facial_feedback_app.feature_record.presentation.camera
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -50,14 +50,15 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
 import com.example.facial_feedback_app.R
-import com.example.facial_feedback_app.presentation.MainViewModel
-import com.example.facial_feedback_app.presentation.camera.state.CameraModeState
-import com.example.facial_feedback_app.presentation.camera.state.RecordingState
-import com.example.facial_feedback_app.presentation.utils.CameraPreview
+import com.example.facial_feedback_app.feature_record.presentation.MainViewModel
+import com.example.facial_feedback_app.feature_record.presentation.camera.state.CameraModeState
+import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
+import com.example.facial_feedback_app.feature_record.presentation.utils.CameraPreview
 import com.example.facial_feedback_app.utils.toRotatedBitmap
 import com.google.mlkit.vision.face.Face
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -85,25 +86,22 @@ fun CameraScreen(
             )
 
 
+            bindToLifecycle(lifecycleOwner)
+
+
         }
     }
-
-
-    cameraController.bindToLifecycle(lifecycleOwner)
-
-
-
-
-
 
     cameraController.setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context)){imageProxy:ImageProxy->
 
         Log.d("recording",cameraController.isRecording.toString())
         if(viewmodel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
 
-            viewmodel.mlKitFaceDetector.getFacesFromCapturedImage(imageProxy.toRotatedBitmap()){
+            viewmodel.mlKitFaceDetector.getFacesFromCapturedImage(imageProxy.toRotatedBitmap()){faceBitmapList:List<Bitmap>,faceList:List<Face>->
 
-                viewmodel.addFaces(it)
+
+                viewmodel.addFaces(faceBitmapList)
+
 
 
             }
@@ -120,6 +118,7 @@ fun CameraScreen(
     ){
 
         CameraPreview(controller =cameraController,Modifier.fillMaxSize() )
+
         
         
         Row(
@@ -188,7 +187,7 @@ fun CameraScreen(
 
                                         viewmodel.onStart(
                                                 controller = cameraController,
-                                                applicationContext = context
+                                                context = context
                                         )
 
                                     },

@@ -1,4 +1,4 @@
-package com.example.facial_feedback_app.presentation.utils
+package com.example.facial_feedback_app.feature_record.presentation.utils
 
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.view.LifecycleCameraController

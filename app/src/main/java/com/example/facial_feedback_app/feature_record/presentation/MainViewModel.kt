@@ -1,4 +1,4 @@
-package com.example.facial_feedback_app.presentation
+package com.example.facial_feedback_app.feature_record.presentation
 
 import android.graphics.Bitmap
 import android.graphics.Canvas

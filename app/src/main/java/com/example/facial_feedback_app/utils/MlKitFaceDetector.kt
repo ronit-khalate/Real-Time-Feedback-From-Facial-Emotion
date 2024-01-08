@@ -24,7 +24,7 @@ class MlKitFaceDetector @Inject constructor() {
 
     fun getFacesFromCapturedImage(
         bitmap: Bitmap,
-        addFaceToList:(List<Bitmap>)->Unit
+        addFaceToList:(List<Bitmap>,List<Face>)->Unit
     ){
 
         val image = InputImage.fromBitmap(bitmap, 0)
@@ -51,7 +51,7 @@ class MlKitFaceDetector @Inject constructor() {
 
                 }
 
-                addFaceToList(facesList)
+                addFaceToList(facesList,faces)
                 facesList.clear()
 
 

@@ -1,4 +1,4 @@
-package com.example.facial_feedback_app.presentation.camera.state
+package com.example.facial_feedback_app.feature_record.presentation.camera.state
 
 
 import androidx.compose.foundation.layout.height
@@ -38,7 +38,7 @@ sealed class RecordingState(
             color = Color.Red.copy(alpha = 0.7f)
     )
 
-    object clicked:RecordingState(
+    object clicked: RecordingState(
             modifier = Modifier
                 .height(70.dp)
                 .width(70.dp)
