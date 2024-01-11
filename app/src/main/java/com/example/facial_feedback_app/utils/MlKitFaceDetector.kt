@@ -2,10 +2,14 @@ package com.example.facial_feedback_app.utils
 
 import android.graphics.Bitmap
 import android.util.Log
+import com.example.facial_feedback_app.feature_record.domain.FaceBoundInfo
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class MlKitFaceDetector @Inject constructor() {
@@ -16,8 +20,14 @@ class MlKitFaceDetector @Inject constructor() {
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
         .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
         .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_NONE)
-        .setMinFaceSize(100F)
+        .enableTracking()
         .build()
+
+    // Object Detectiona and tracking
+
+    private var _faceBoundFlow:MutableStateFlow<List<Face>> = MutableStateFlow(emptyList())
+    val faceBoundFlow = _faceBoundFlow.asStateFlow()
+
 
     // Face Detector
     val mlKitFaceDetector = FaceDetection.getClient(faceDetectorOptions)
@@ -32,28 +42,62 @@ class MlKitFaceDetector @Inject constructor() {
         var facesList:MutableList<Face> = mutableListOf()
         mlKitFaceDetector.process(image)
             .addOnSuccessListener { faces->
+
+                if(faces.isNotEmpty())
+                 _faceBoundFlow.update { faces }
+                else
+                    _faceBoundFlow.update { emptyList() }
+
                 Log.d("Success", "${faces.size}")
+                val bitmapp = bitmap.copy(bitmap.config,true)
                 faces.forEach {face->
                     val boundingBox = face.boundingBox
+//
+//                    val canvas = android.graphics.Canvas(bitmapp)
+//                    val paint = Paint().apply {
+//                        color = Color.RED // You can use any color you prefer
+//                        style = Paint.Style.STROKE
+//                        strokeWidth = 5f
+//                    }
+//
+//                    canvas.drawRect(
+//                            boundingBox.left.toFloat(),
+//                            boundingBox.top.toFloat(),
+//                            boundingBox.right.toFloat(),
+//                            boundingBox.bottom.toFloat(),
+//                            paint
+//                    )
+//
+//                    bitmapp
 
 
-                    // Ensure that bounding box coordinates are within the bounds of the original bitmap
+//                    // Ensure that bounding box coordinates are within the bounds of the original bitmap
                     val x :Int= boundingBox.left.coerceAtLeast(0)
                     val y :Int= boundingBox.top.coerceAtLeast(0)
                     val width = boundingBox.width().coerceAtMost(bitmap.width - x)
                     val height = boundingBox.height().coerceAtMost(bitmap.height - y)
+                    val faceBound = FaceBoundInfo(
+                            x=x,
+                            y=y,
+                            width=width,
+                            height=height,
+                            boundingBox=boundingBox
+                    )
 
-                    // Create a new Bitmap with the corrected dimensions
+//                     Create a new Bitmap with the corrected dimensions
                     if (width > 0 && height > 0) {
                         val croppedFace = Bitmap.createBitmap(bitmap, x, y, width, height)
-                        faceBitmapList.add(croppedFace.toGrayscale().resize(100,100))
+                        faceBitmapList.add(croppedFace.toGrayscale())
                         facesList.add(face)
-                    }
 
+
+
+                    }
 
                 }
 
                 addFaceToList(faceBitmapList.toList(),facesList.toList())
+
                 faceBitmapList.clear()
                 facesList.clear()
 

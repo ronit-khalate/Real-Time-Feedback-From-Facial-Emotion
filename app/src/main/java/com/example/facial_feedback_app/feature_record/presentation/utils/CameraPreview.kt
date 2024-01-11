@@ -1,32 +1,41 @@
 package com.example.facial_feedback_app.feature_record.presentation.utils
 
-import androidx.camera.core.ImageAnalysis
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 
 @Composable
 fun CameraPreview(
     controller:LifecycleCameraController,
-    modifier:Modifier=Modifier
+    modifier:Modifier=Modifier,
+    addRectView:(Int,Int)->Unit
 ){
     val lifecycleOwner = LocalLifecycleOwner.current
 
 
     AndroidView(
-            factory = {
+            factory = { context ->
 
-                PreviewView(it).apply {
+                PreviewView(context).apply {
                     this.controller=controller
+
                     controller.bindToLifecycle(lifecycleOwner)
+
+
+
+
+
                 }
+
             },
-            modifier = modifier
-    )
+
+
+            modifier=modifier
+
+
+
+            )
 }

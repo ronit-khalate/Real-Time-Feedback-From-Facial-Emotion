@@ -11,9 +11,11 @@ import com.example.facial_feedback_app.feature_record.domain.Camera
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.CameraModeState
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
 import com.example.facial_feedback_app.utils.MlKitFaceDetector
+import com.google.mlkit.vision.face.Face
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,6 +35,10 @@ class CameraViewModel @Inject constructor(
     private val _bitmaps = MutableStateFlow<List<Bitmap>>(emptyList())
     var bitmaps = _bitmaps.asStateFlow()
 
+    private val _faceList = MutableStateFlow<List<Face>>(emptyList())
+
+    var faceList = _faceList
+
     var loading by mutableStateOf(false)
 
     fun addFaces(faces:List<Bitmap>){
@@ -44,7 +50,9 @@ class CameraViewModel @Inject constructor(
 
 
 
-
+    fun updateFaceListFlow(list: List<Face>){
+        _faceList.update { list }
+    }
     // Starting video recording or capturing image
     fun onStart(controller: LifecycleCameraController,context: Context){
 

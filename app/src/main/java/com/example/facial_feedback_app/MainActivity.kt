@@ -69,8 +69,7 @@ class MainActivity : ComponentActivity() {
 
                             composable(route = BottomNavItem.image.screen_route){
                                 CameraScreen(
-                                    applicationContext = applicationContext,
-                                    viewmodel = cameraViewModel
+                                        viewmodel = cameraViewModel
                                 )
                             }
 

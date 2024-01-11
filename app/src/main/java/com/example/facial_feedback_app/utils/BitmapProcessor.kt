@@ -32,6 +32,7 @@ fun Bitmap.resize(x:Int,y:Int): Bitmap {
     return Bitmap.createScaledBitmap(this, x, y, false)
 }
 
+
 fun ImageProxy.toRotatedBitmap():Bitmap{
     val matrix = Matrix().apply {
         postRotate(this@toRotatedBitmap.imageInfo.rotationDegrees.toFloat())
@@ -43,6 +44,9 @@ fun ImageProxy.toRotatedBitmap():Bitmap{
             0,
             this.width,
             this.height,
-            matrix,true
+            matrix,
+            true
     )
+
+
 }
