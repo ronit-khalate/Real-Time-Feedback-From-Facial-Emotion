@@ -1,31 +1,39 @@
 package com.example.facial_feedback_app.utils
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
-import android.graphics.Paint
 import androidx.camera.core.ImageProxy
 
-fun Bitmap.toGrayscale(): Bitmap {
-    val width = this.width
-    val height = this.height
+fun Bitmap.toGrayscale(): IntArray {
 
-    val bitmapResult = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-    val canvas = Canvas(bitmapResult)
-    val paint = Paint()
+    val RED2GS = 0.299
+    val GREEN2GS = 0.587
+    val BLUE2GS = 0.114
 
-    val colorMatrix = ColorMatrix()
-    colorMatrix.setSaturation(0f) // Set saturation to 0 for grayscale
+    var pixel:Int
+    val pixels = IntArray(this.width*this.height)
 
-    val colorFilter = ColorMatrixColorFilter(colorMatrix)
-    paint.colorFilter = colorFilter
+    (0 until this.height).forEach {y->
 
-    canvas.drawBitmap(this, 0f, 0f, paint)
+        (0 until this.width).forEach { x->
 
-    return bitmapResult
+            pixel= this.getPixel(x,y)
+//            val color =Color(pixel)
+
+            val redPart = android.graphics.Color.red(pixel)
+            val greenPart = android.graphics.Color.green(pixel)
+            val bluePart = android.graphics.Color.blue(pixel)
+
+            pixels[y*this.width+x]=((redPart * RED2GS + greenPart* GREEN2GS + bluePart *BLUE2GS).toInt())
+
+        }
+    }
+
+    return pixels
+
 }
+
+
 
 fun Bitmap.resize(x:Int,y:Int): Bitmap {
 

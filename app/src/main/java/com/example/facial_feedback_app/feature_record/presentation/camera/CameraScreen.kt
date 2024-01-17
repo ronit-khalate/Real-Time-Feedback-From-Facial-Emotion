@@ -1,7 +1,9 @@
 package com.example.facial_feedback_app.feature_record.presentation.camera
 
+import android.graphics.Bitmap
+import android.util.Log
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.mlkit.vision.MlKitAnalyzer
+import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.Canvas
@@ -49,6 +51,8 @@ import androidx.core.content.ContextCompat
 import com.example.facial_feedback_app.R
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
 import com.example.facial_feedback_app.feature_record.presentation.utils.CameraPreview
+import com.example.facial_feedback_app.utils.toRotatedBitmap
+import com.google.mlkit.vision.face.Face
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,28 +87,28 @@ fun CameraScreen(
                     CameraController.IMAGE_ANALYSIS
             )
 
-            setImageAnalysisAnalyzer(
-                    ContextCompat.getMainExecutor(context),
-                    MlKitAnalyzer(
-                            listOf(viewmodel.mlKitFaceDetector.mlKitFaceDetector),
-                            ImageAnalysis.COORDINATE_SYSTEM_ORIGINAL,
-                            ContextCompat.getMainExecutor(context)
-                    ) { result: MlKitAnalyzer.Result? ->
-
-                        result?.getValue(viewmodel.mlKitFaceDetector.mlKitFaceDetector).let {faceList->
-                            if (viewmodel.cameraModeState.recordingState is RecordingState.Started && this.isRecording) {
-
-                                faceList?.let {
-                                    viewmodel.updateFaceListFlow(it)
-                                } ?: viewmodel.updateFaceListFlow(emptyList())
-                            }
-                        }
-
-
-                    }.apply {
-                        defaultTargetResolution
-                    }
-            )
+//            setImageAnalysisAnalyzer(
+//                    ContextCompat.getMainExecutor(context),
+//                    MlKitAnalyzer(
+//                            listOf(viewmodel.mlKitFaceDetector.mlKitFaceDetector),
+//                            ImageAnalysis.COORDINATE_SYSTEM_ORIGINAL,
+//                            ContextCompat.getMainExecutor(context)
+//                    ) { result: MlKitAnalyzer.Result? ->
+//
+//                        result?.getValue(viewmodel.mlKitFaceDetector.mlKitFaceDetector).let {faceList->
+//                            if (viewmodel.cameraModeState.recordingState is RecordingState.Started && this.isRecording) {
+//
+//                                faceList?.let {
+//                                    viewmodel.updateFaceListFlow(it)
+//                                } ?: viewmodel.updateFaceListFlow(emptyList())
+//                            }
+//                        }
+//
+//
+//                    }.apply {
+//                        defaultTargetResolution
+//                    }
+//            )
 
 
 
@@ -116,24 +120,24 @@ fun CameraScreen(
     }
 
 
-//    cameraController.setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context)){imageProxy:ImageProxy->
-//
-//        Log.d("recording",cameraController.isRecording.toString())
-//
-//        if(viewmodel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
-//
-//            viewmodel.mlKitFaceDetector.getFacesFromCapturedImage(imageProxy.toRotatedBitmap()){faceBitmapList:List<Bitmap>,_faceList:List<Face>->
-//
-//
-//                viewmodel.addFaces(faceBitmapList)
-//
-//
-//
-//            }
-//        }
-//        imageProxy.close()
-//
-//    }
+    cameraController.setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context)){imageProxy: ImageProxy ->
+
+        Log.d("recording", cameraController.isRecording.toString())
+
+        if(viewmodel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
+
+            viewmodel.mlKitFaceDetector.getFacesFromCapturedImage(imageProxy.toRotatedBitmap()){faceBitmapList:List<Bitmap>,_faceList:List<Face>->
+
+
+                viewmodel.addFaces(faceBitmapList)
+
+
+
+            }
+        }
+        imageProxy.close()
+
+    }
 
 
 

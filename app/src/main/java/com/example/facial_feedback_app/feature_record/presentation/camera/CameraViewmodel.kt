@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.facial_feedback_app.feature_record.domain.Camera
+import com.example.facial_feedback_app.feature_record.domain.classifer.EmotionClassifierImpl
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.CameraModeState
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
 import com.example.facial_feedback_app.utils.MlKitFaceDetector
@@ -21,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CameraViewModel @Inject constructor(
         val mlKitFaceDetector: MlKitFaceDetector,
+        val emotionClassifier: EmotionClassifierImpl,
         val camera: Camera
 ):ViewModel() {
 
@@ -104,6 +106,11 @@ class CameraViewModel @Inject constructor(
     ){
 
         camera.recordVideo(controller=controller, context = context)
+    }
+
+    fun classify(faceBitmap:Bitmap){
+
+        emotionClassifier.classify(faceBitmap,false)
     }
 
 }

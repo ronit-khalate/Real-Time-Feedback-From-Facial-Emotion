@@ -3,6 +3,7 @@ package com.example.facial_feedback_app.utils
 import android.graphics.Bitmap
 import android.util.Log
 import com.example.facial_feedback_app.feature_record.domain.FaceBoundInfo
+import com.example.facial_feedback_app.feature_record.domain.classifer.EmotionClassifierImpl
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
@@ -12,7 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-class MlKitFaceDetector @Inject constructor() {
+class MlKitFaceDetector @Inject constructor(
+    private val emotionClassifier: EmotionClassifierImpl
+) {
 
 
     // Face Detection model parameter
@@ -52,26 +55,10 @@ class MlKitFaceDetector @Inject constructor() {
                 val bitmapp = bitmap.copy(bitmap.config,true)
                 faces.forEach {face->
                     val boundingBox = face.boundingBox
-//
-//                    val canvas = android.graphics.Canvas(bitmapp)
-//                    val paint = Paint().apply {
-//                        color = Color.RED // You can use any color you prefer
-//                        style = Paint.Style.STROKE
-//                        strokeWidth = 5f
-//                    }
-//
-//                    canvas.drawRect(
-//                            boundingBox.left.toFloat(),
-//                            boundingBox.top.toFloat(),
-//                            boundingBox.right.toFloat(),
-//                            boundingBox.bottom.toFloat(),
-//                            paint
-//                    )
-//
-//                    bitmapp
 
 
-//                    // Ensure that bounding box coordinates are within the bounds of the original bitmap
+
+                  // Ensure that bounding box coordinates are within the bounds of the original bitmap
                     val x :Int= boundingBox.left.coerceAtLeast(0)
                     val y :Int= boundingBox.top.coerceAtLeast(0)
                     val width = boundingBox.width().coerceAtMost(bitmap.width - x)
@@ -87,10 +74,9 @@ class MlKitFaceDetector @Inject constructor() {
 //                     Create a new Bitmap with the corrected dimensions
                     if (width > 0 && height > 0) {
                         val croppedFace = Bitmap.createBitmap(bitmap, x, y, width, height)
-                        faceBitmapList.add(croppedFace.toGrayscale())
+                        emotionClassifier.classify(croppedFace,false)
+                        faceBitmapList.add(croppedFace)
                         facesList.add(face)
-
-
 
                     }
 
