@@ -1,6 +1,5 @@
 package com.example.facial_feedback_app.feature_record.presentation.camera
 
-import android.graphics.Bitmap
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -49,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.example.facial_feedback_app.R
+import com.example.facial_feedback_app.feature_record.domain.StorageImage
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
 import com.example.facial_feedback_app.feature_record.presentation.utils.CameraPreview
 import com.example.facial_feedback_app.utils.toRotatedBitmap
@@ -126,7 +126,7 @@ fun CameraScreen(
 
         if(viewmodel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
 
-            viewmodel.mlKitFaceDetector.getFacesFromCapturedImage(imageProxy.toRotatedBitmap()){faceBitmapList:List<Bitmap>,_faceList:List<Face>->
+            viewmodel.mlKitFaceDetector.getFacesFromCapturedImage(imageProxy.toRotatedBitmap()){faceBitmapList:List<StorageImage>,_faceList:List<Face>->
 
 
                 viewmodel.addFaces(faceBitmapList)

@@ -3,6 +3,7 @@ package com.example.facial_feedback_app.utils
 import android.graphics.Bitmap
 import android.util.Log
 import com.example.facial_feedback_app.feature_record.domain.FaceBoundInfo
+import com.example.facial_feedback_app.feature_record.domain.StorageImage
 import com.example.facial_feedback_app.feature_record.domain.classifer.EmotionClassifierImpl
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
@@ -37,11 +38,11 @@ class MlKitFaceDetector @Inject constructor(
 
     fun getFacesFromCapturedImage(
         bitmap: Bitmap,
-        addFaceToList:(List<Bitmap>,List<Face>)->Unit
+        addFaceToList:(List<StorageImage>,List<Face>)->Unit
     ){
 
         val image = InputImage.fromBitmap(bitmap, 0)
-        var faceBitmapList:MutableList<Bitmap> = mutableListOf()
+        var faceBitmapList:MutableList<StorageImage> = mutableListOf()
         var facesList:MutableList<Face> = mutableListOf()
         mlKitFaceDetector.process(image)
             .addOnSuccessListener { faces->
@@ -74,8 +75,18 @@ class MlKitFaceDetector @Inject constructor(
 //                     Create a new Bitmap with the corrected dimensions
                     if (width > 0 && height > 0) {
                         val croppedFace = Bitmap.createBitmap(bitmap, x, y, width, height)
-                        emotionClassifier.classify(croppedFace,false)
-                        faceBitmapList.add(croppedFace)
+                        val emotionmap =emotionClassifier.classify(croppedFace,false)
+
+                        val firstThree= emotionmap
+                            .toList()
+                            .sortedByDescending { it.second }
+                            .take(3)
+                            .associate {
+                                Pair(it.first, it.second * 100)
+                            }
+
+                        val storageImage = StorageImage(croppedFace, firstThree)
+                        faceBitmapList.add(storageImage)
                         facesList.add(face)
 
                     }
