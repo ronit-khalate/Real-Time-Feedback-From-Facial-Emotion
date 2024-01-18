@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-
 import androidx.compose.foundation.layout.width
-
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -58,7 +56,7 @@ fun StorageReview(
 
                 for (key in bitmap.emotion.keys){
 
-                    Text(text = "${key} = ${bitmap.emotion[key]}")
+                    Text(text = "${key} = ${bitmap.emotion[key].toString().substring(0,5)}%")
                 }
 
             }
