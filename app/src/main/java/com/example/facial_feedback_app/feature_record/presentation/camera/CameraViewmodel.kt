@@ -1,9 +1,6 @@
 package com.example.facial_feedback_app.feature_record.presentation.camera
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,7 +8,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.facial_feedback_app.feature_record.domain.Camera
 import com.example.facial_feedback_app.feature_record.domain.StorageImage
-import com.example.facial_feedback_app.feature_record.domain.classifer.EmotionClassifierImpl
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.CameraModeState
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
 import com.example.facial_feedback_app.utils.MlKitFaceDetector
@@ -19,13 +15,11 @@ import com.google.mlkit.vision.face.Face
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
 class CameraViewModel @Inject constructor(
         val mlKitFaceDetector: MlKitFaceDetector,
-        val emotionClassifier: EmotionClassifierImpl,
         val camera: Camera
 ):ViewModel() {
 
@@ -50,16 +44,7 @@ class CameraViewModel @Inject constructor(
         _bitmaps.value+=faces
     }
 
-
-
-
-
-
-    fun updateFaceListFlow(list: List<Face>){
-        _faceList.update { list }
-    }
     // Starting video recording or capturing image
-    @RequiresApi(Build.VERSION_CODES.S)
     fun onStart(controller: LifecycleCameraController,context: Context){
 
         when(cameraModeState){
@@ -113,9 +98,5 @@ class CameraViewModel @Inject constructor(
         camera.recordVideo(controller=controller, context = context)
     }
 
-    fun classify(faceBitmap:Bitmap){
-
-        emotionClassifier.classify(faceBitmap,false)
-    }
 
 }
