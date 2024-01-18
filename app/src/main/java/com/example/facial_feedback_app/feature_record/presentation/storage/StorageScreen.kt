@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+
+import androidx.compose.foundation.layout.width
+
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -36,24 +39,28 @@ fun StorageReview(
         ){ bitmap ->
 
             Column(
+
                     modifier = Modifier,
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
+
             ) {
                 Image(
-                        bitmap = bitmap.asImageBitmap(),
+                        bitmap = bitmap.image.asImageBitmap(),
                         modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp)),
+                            .clip(RoundedCornerShape(12.dp))
+                            .height(100.dp)
+                            .width(100.dp),
                         contentDescription =""
                 )
-                Spacer(modifier = Modifier.height(10.dp))
 
-                Text("")
                 Spacer(modifier = Modifier.height(5.dp))
-                Text("")
-                Spacer(modifier = Modifier.height(5.dp))
-                Text("")
-                Spacer(modifier = Modifier.height(5.dp))
+
+                for (key in bitmap.emotion.keys){
+
+                    Text(text = "${key} = ${bitmap.emotion[key]}")
+                }
+
             }
 
         }

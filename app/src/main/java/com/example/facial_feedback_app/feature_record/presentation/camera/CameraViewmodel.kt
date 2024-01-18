@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.facial_feedback_app.feature_record.domain.Camera
+import com.example.facial_feedback_app.feature_record.domain.StorageImage
 import com.example.facial_feedback_app.feature_record.domain.classifer.EmotionClassifierImpl
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.CameraModeState
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
@@ -34,7 +35,7 @@ class CameraViewModel @Inject constructor(
 
 
 
-    private val _bitmaps = MutableStateFlow<List<Bitmap>>(emptyList())
+    private val _bitmaps = MutableStateFlow<List<StorageImage>>(emptyList())
     var bitmaps = _bitmaps.asStateFlow()
 
     private val _faceList = MutableStateFlow<List<Face>>(emptyList())
@@ -43,7 +44,7 @@ class CameraViewModel @Inject constructor(
 
     var loading by mutableStateOf(false)
 
-    fun addFaces(faces:List<Bitmap>){
+    fun addFaces(faces:List<StorageImage>){
         _bitmaps.value+=faces
     }
 
