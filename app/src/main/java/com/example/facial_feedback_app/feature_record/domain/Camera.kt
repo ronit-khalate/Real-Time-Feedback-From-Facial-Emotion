@@ -3,11 +3,9 @@ package com.example.facial_feedback_app.feature_record.domain
 import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
@@ -32,8 +30,12 @@ class Camera @Inject constructor() {
     companion object{
         const val TAG="cameraClass"
     }
-    var recording:Recording?=null
-    var currentRecordingFile:Uri?=null
+    private var recording:Recording?=null
+    private var currentRecordingFile:Uri?=null
+
+    /*
+    * Capturing Images
+    * */
     fun takePhoto(
         controller: LifecycleCameraController,
         context: Context
@@ -56,11 +58,16 @@ class Camera @Inject constructor() {
         )
     }
 
-    fun closeRecoding(context: Context){
+    /*
+    * closing the recording
+    * and setting both recording and currentRecordingFile to null
+    * */
+
+    fun closeRecoding(){
 
         recording?.close()
-
         recording=null
+        currentRecordingFile=null
 
     }
 
@@ -81,7 +88,7 @@ class Camera @Inject constructor() {
 
    }
 
-    @RequiresApi(Build.VERSION_CODES.S)
+
     fun recordVideo(
         controller: LifecycleCameraController,
         context: Context

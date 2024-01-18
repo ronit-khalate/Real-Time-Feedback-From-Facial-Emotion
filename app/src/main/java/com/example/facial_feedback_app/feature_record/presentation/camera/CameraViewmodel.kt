@@ -59,6 +59,7 @@ class CameraViewModel @Inject constructor(
         _faceList.update { list }
     }
     // Starting video recording or capturing image
+    @RequiresApi(Build.VERSION_CODES.S)
     fun onStart(controller: LifecycleCameraController,context: Context){
 
         when(cameraModeState){
@@ -66,7 +67,7 @@ class CameraViewModel @Inject constructor(
             is CameraModeState.Video->{
                 if(cameraModeState.recordingState is RecordingState.Started){
                     cameraModeState = CameraModeState.Video(RecordingState.Stopped)
-                   camera.closeRecoding(context)
+                   camera.closeRecoding()
 
                 }
                 else{
@@ -103,7 +104,7 @@ class CameraViewModel @Inject constructor(
 
         camera.takePhoto(controller,context)
     }
-    @RequiresApi(Build.VERSION_CODES.S)
+
     private fun recordVideo(
         controller: LifecycleCameraController,
         context: Context
