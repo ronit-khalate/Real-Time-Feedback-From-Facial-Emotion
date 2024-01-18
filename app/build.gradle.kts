@@ -73,6 +73,9 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
+
+
     val lifecycle_version = "2.6.2"
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")

@@ -74,7 +74,11 @@ class MlKitFaceDetector @Inject constructor(
 //                     Create a new Bitmap with the corrected dimensions
                     if (width > 0 && height > 0) {
                         val croppedFace = Bitmap.createBitmap(bitmap, x, y, width, height)
-                        emotionClassifier.classify(croppedFace,false)
+                        val emotionModel=emotionClassifier.classify(croppedFace,false)
+
+                        emotionModel.toSortedMap(comparator = compareBy {
+                            emotionModel[it]
+                        })
                         faceBitmapList.add(croppedFace)
                         facesList.add(face)
 
