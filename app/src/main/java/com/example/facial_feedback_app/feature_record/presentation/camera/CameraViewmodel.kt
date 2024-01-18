@@ -2,6 +2,8 @@ package com.example.facial_feedback_app.feature_record.presentation.camera
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,7 +66,7 @@ class CameraViewModel @Inject constructor(
             is CameraModeState.Video->{
                 if(cameraModeState.recordingState is RecordingState.Started){
                     cameraModeState = CameraModeState.Video(RecordingState.Stopped)
-                   camera.closeRecoding()
+                   camera.closeRecoding(context)
 
                 }
                 else{
@@ -101,6 +103,7 @@ class CameraViewModel @Inject constructor(
 
         camera.takePhoto(controller,context)
     }
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun recordVideo(
         controller: LifecycleCameraController,
         context: Context
