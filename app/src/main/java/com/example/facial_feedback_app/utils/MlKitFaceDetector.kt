@@ -10,7 +10,6 @@ import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -30,7 +29,7 @@ class MlKitFaceDetector @Inject constructor(
     // Object Detectiona and tracking
 
     private var _faceBoundFlow:MutableStateFlow<List<Face>> = MutableStateFlow(emptyList())
-    val faceBoundFlow = _faceBoundFlow.asStateFlow()
+
 
 
     // Face Detector
@@ -42,8 +41,8 @@ class MlKitFaceDetector @Inject constructor(
     ){
 
         val image = InputImage.fromBitmap(bitmap, 0)
-        var faceBitmapList:MutableList<StorageImage> = mutableListOf()
-        var facesList:MutableList<Face> = mutableListOf()
+        val faceBitmapList:MutableList<StorageImage> = mutableListOf()
+        val facesList:MutableList<Face> = mutableListOf()
         mlKitFaceDetector.process(image)
             .addOnSuccessListener { faces->
 
@@ -53,7 +52,6 @@ class MlKitFaceDetector @Inject constructor(
                     _faceBoundFlow.update { emptyList() }
 
                 Log.d("Success", "${faces.size}")
-                val bitmapp = bitmap.copy(bitmap.config,true)
                 faces.forEach {face->
                     val boundingBox = face.boundingBox
 

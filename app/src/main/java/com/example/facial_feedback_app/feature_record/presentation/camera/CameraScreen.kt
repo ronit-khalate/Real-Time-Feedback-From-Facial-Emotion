@@ -121,7 +121,7 @@ fun CameraScreen(
 
 
     cameraController.setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context)){imageProxy: ImageProxy ->
-
+        
         Log.d("recording", cameraController.isRecording.toString())
 
         if(viewmodel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
