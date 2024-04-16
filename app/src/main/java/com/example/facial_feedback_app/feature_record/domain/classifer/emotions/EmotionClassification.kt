@@ -12,6 +12,7 @@ class EmotionClassification(
     private var imageWidth by Delegates.notNull<Int>()
     private var imageColorLength by Delegates.notNull<Int>()
     private var imageOutputLength by Delegates.notNull<Int>()
+
     init {
         imageHeight=InterpreterParameters.getInputImageHeight(interpreter)
         imageWidth=InterpreterParameters.getInputImageWidth(interpreter)

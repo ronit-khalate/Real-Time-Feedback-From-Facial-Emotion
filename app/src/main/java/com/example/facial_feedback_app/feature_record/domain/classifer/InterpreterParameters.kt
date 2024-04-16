@@ -5,10 +5,9 @@ import org.tensorflow.lite.InterpreterApi
 class InterpreterParameters {
 
 
-
-
     companion object{
         private const val IMAGE_INPUT_TENSOR_INDEX = 0
+
         private const val IMAGE_OUTPUT_TENSOR_INDEX = 0
 
         // Indices of an input image parameters
