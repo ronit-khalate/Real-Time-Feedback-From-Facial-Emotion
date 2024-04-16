@@ -115,5 +115,8 @@ dependencies {
 //    // Import the GPU delegate plugin Library for GPU inference
     implementation ("org.tensorflow:tensorflow-lite-gpu-delegate-plugin:0.4.4")
     implementation ("org.tensorflow:tensorflow-lite-gpu:2.14.0")
+
+    // Y chart
+    implementation("co.yml:ycharts:2.1.0")
 }
 
