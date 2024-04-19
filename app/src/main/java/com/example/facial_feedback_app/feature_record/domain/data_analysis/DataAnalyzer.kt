@@ -1,6 +1,7 @@
 package com.example.facial_feedback_app.feature_record.domain.data_analysis
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.LifecycleCameraController
@@ -8,19 +9,27 @@ import androidx.core.content.ContextCompat
 import com.example.facial_feedback_app.feature_record.domain.Emotions
 import com.example.facial_feedback_app.feature_record.presentation.camera.CameraViewModel
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
+import com.example.facial_feedback_app.utils.MlKitFaceDetector
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
 
-class DataAnalyzer @Inject constructor() {
+class DataAnalyzer @Inject constructor(
+       private val mlKitFaceDetector: MlKitFaceDetector
+) {
 
 
     var overAllEmotions:MutableList<Long> = mutableListOf()
         private set
 
     // Time series Emotion collection
-    val timeSeriesEmotionCollection:MutableMap<Long,List<Long>> = mutableMapOf()
+    /**
+     * List<FloatArray> is used because each frame may have multiple faces
+     * to each face has one float array for its emotions
+     * */
+    val timeSeriesEmotionCollection:MutableMap<Long,List<FloatArray>> = mutableMapOf()
 
 
 
@@ -28,7 +37,7 @@ class DataAnalyzer @Inject constructor() {
     * This method gives time series of particular emotions
     * Need Emotions enums object
     * */
-    fun getEmotionTimeSeriesData(emotion: Emotions): Map<Long, Long> {
+    fun getEmotionTimeSeriesData(emotion: Emotions): Map<Long, FloatArray> {
 
 
 
@@ -39,21 +48,36 @@ class DataAnalyzer @Inject constructor() {
     }
 
 
-    fun updateData(allEmotionMap:List<Float>){
-        
+    fun updateData(time:Long,emotionMap:List<FloatArray>){
+        timeSeriesEmotionCollection[time] = emotionMap
+
+
+    }
+
+    fun analyze(time:Long,emotionMap:List<Long>){
+
+
     }
 
 
-    fun imageProxyFlow(cameraController: LifecycleCameraController,context:Context,viewModel: CameraViewModel):Flow<ImageProxy> = callbackFlow{
+    fun imageProxyFlow(cameraController: LifecycleCameraController,context:Context,viewModel: CameraViewModel):Flow<Bitmap> = callbackFlow{
+
+
 
         cameraController.setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context)){imageProxy: ImageProxy ->
 
-            Log.d("recording", cameraController.isRecording.toString())
+            Log.d("recording", "hi")
 
-            if(viewModel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
+            imageProxy.use {
+                if(viewModel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
 
-                trySend(imageProxy)
+                    trySend(imageProxy.toBitmap())
+                }
             }
+
+
+
+
 
 
 //            imageProxy.use {
@@ -72,6 +96,10 @@ class DataAnalyzer @Inject constructor() {
 //            }
 
 
+
+        }
+
+        awaitClose {
 
         }
 
