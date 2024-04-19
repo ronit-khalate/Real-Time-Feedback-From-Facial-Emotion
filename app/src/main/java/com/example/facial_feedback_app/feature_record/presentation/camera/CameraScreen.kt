@@ -64,7 +64,6 @@ fun CameraScreen(
         mutableStateOf(0F)
     }
     val context = LocalContext.current
-
     val lifecycleOwner = LocalLifecycleOwner.current
     var latestFaceBound  = viewmodel.faceList.collectAsState(initial = emptyList()).value
 
