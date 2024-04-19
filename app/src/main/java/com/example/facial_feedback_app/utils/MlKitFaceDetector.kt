@@ -3,7 +3,6 @@ package com.example.facial_feedback_app.utils
 import android.graphics.Bitmap
 import android.util.Log
 import com.example.facial_feedback_app.feature_record.domain.FaceBoundInfo
-import com.example.facial_feedback_app.feature_record.domain.StorageImage
 import com.example.facial_feedback_app.feature_record.domain.classifer.EmotionClassifierImpl
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
@@ -16,6 +15,7 @@ import javax.inject.Inject
 class MlKitFaceDetector @Inject constructor(
     private val emotionClassifier: EmotionClassifierImpl
 ) {
+
 
 
     // Face Detection model parameter
@@ -37,13 +37,14 @@ class MlKitFaceDetector @Inject constructor(
 
     fun getFacesFromCapturedImage(
         bitmap: Bitmap,
-        addFaceToList:(emotionMap:Map<Int,Float>)->Unit
-    ){
+    ):List<FloatArray>{
 
         val image = InputImage.fromBitmap(bitmap, 0)
-        val faceBitmapList:MutableList<StorageImage> = mutableListOf()
-        val facesList:MutableList<Face> = mutableListOf()
+
+        val faceBitmapList:MutableList<Bitmap> = mutableListOf()
         val emotionMapOfFrame:MutableMap<Int,Float> = mutableMapOf()
+
+        val emotionsOfAllFacesInFrame:MutableList<FloatArray> = mutableListOf()
         mlKitFaceDetector.process(image)
             .addOnSuccessListener { faces->
 
@@ -75,32 +76,35 @@ class MlKitFaceDetector @Inject constructor(
                     if (width > 0 && height > 0) {
                         val croppedFace = Bitmap.createBitmap(bitmap, x, y, width, height)
 
-                        val emotionMap =emotionClassifier.classify(croppedFace,false)
+                        val  faceEmotionArray =emotionClassifier.classify(croppedFace,false)
+                        emotionsOfAllFacesInFrame.add(faceEmotionArray)
 
                         emotionMapOfFrame.forEach { (key,value)->
 
                            emotionMapOfFrame[key]= emotionMapOfFrame.getOrDefault(key,0.0F) + value
                         }
 
-                        val storageImage = StorageImage(croppedFace, emotionMap)
-                        faceBitmapList.add(storageImage)
-                        facesList.add(face)
+
+                        faceBitmapList.add(croppedFace)
+
 
                     }
 
                 }
 
-                addFaceToList(emotionMapOfFrame)
+
                 emotionMapOfFrame.clear()
 
                 faceBitmapList.clear()
-                facesList.clear()
+
 
 
             }
             .addOnFailureListener{
                 Log.e("Detect", it.message.toString())
             }
+
+        return  emotionsOfAllFacesInFrame
 
     }
 }
