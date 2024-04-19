@@ -20,7 +20,7 @@ class EmotionClassifierImpl @Inject constructor(
     init {
         classifier= EmotionClassification(interpreter)
     }
-    fun classify(imageBitmap: Bitmap,useFilter: Boolean):Map<String,Float>{
+    fun classify(imageBitmap: Bitmap,useFilter: Boolean):FloatArray{
 
         val preProcessedImage = preProcessImage(imageBitmap,useFilter)
 
@@ -29,7 +29,7 @@ class EmotionClassifierImpl @Inject constructor(
 
     }
 
-    private fun classify(input:FloatArray): Map<String, Float> {
+    private fun classify(input:FloatArray): FloatArray {
         val output = classifier.classify(input)
 
         // Checked compliance with the array of strings specified in the constructor
@@ -58,7 +58,7 @@ class EmotionClassifierImpl @Inject constructor(
 
         }
 
-        return outputMap
+        return output[0]
     }
 
 
