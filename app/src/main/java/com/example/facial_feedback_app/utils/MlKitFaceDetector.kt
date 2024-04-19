@@ -33,16 +33,17 @@ class MlKitFaceDetector @Inject constructor(
 
 
     // Face Detector
-    val mlKitFaceDetector = FaceDetection.getClient(faceDetectorOptions)
+    private val mlKitFaceDetector = FaceDetection.getClient(faceDetectorOptions)
 
     fun getFacesFromCapturedImage(
         bitmap: Bitmap,
-        addFaceToList:(List<StorageImage>,List<Face>)->Unit
+        addFaceToList:(emotionMap:Map<Int,Float>)->Unit
     ){
 
         val image = InputImage.fromBitmap(bitmap, 0)
         val faceBitmapList:MutableList<StorageImage> = mutableListOf()
         val facesList:MutableList<Face> = mutableListOf()
+        val emotionMapOfFrame:MutableMap<Int,Float> = mutableMapOf()
         mlKitFaceDetector.process(image)
             .addOnSuccessListener { faces->
 
@@ -74,17 +75,14 @@ class MlKitFaceDetector @Inject constructor(
                     if (width > 0 && height > 0) {
                         val croppedFace = Bitmap.createBitmap(bitmap, x, y, width, height)
 
-                        val emotionmap =emotionClassifier.classify(croppedFace,false)
+                        val emotionMap =emotionClassifier.classify(croppedFace,false)
 
-                        val firstThree= emotionmap
-                            .toList()
-                            .sortedByDescending { it.second }
-                            .take(3)
-                            .associate {
-                                Pair(it.first, it.second * 100)
-                            }
+                        emotionMapOfFrame.forEach { (key,value)->
 
-                        val storageImage = StorageImage(croppedFace, firstThree)
+                           emotionMapOfFrame[key]= emotionMapOfFrame.getOrDefault(key,0.0F) + value
+                        }
+
+                        val storageImage = StorageImage(croppedFace, emotionMap)
                         faceBitmapList.add(storageImage)
                         facesList.add(face)
 
@@ -92,7 +90,8 @@ class MlKitFaceDetector @Inject constructor(
 
                 }
 
-                addFaceToList(faceBitmapList.toList(),facesList.toList())
+                addFaceToList(emotionMapOfFrame)
+                emotionMapOfFrame.clear()
 
                 faceBitmapList.clear()
                 facesList.clear()
