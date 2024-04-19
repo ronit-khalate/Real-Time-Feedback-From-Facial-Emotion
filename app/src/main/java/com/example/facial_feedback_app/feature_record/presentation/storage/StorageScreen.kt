@@ -5,7 +5,7 @@ import com.example.facial_feedback_app.feature_record.presentation.camera.Camera
 
 
 @Composable
-fun StorageReview(
+fun AnalyticsScreen(
     cameraViewModel: CameraViewModel
 ){
 
