@@ -32,7 +32,7 @@ class CameraViewModel @Inject constructor(
 
 
     var startTimeOfRecording:Long = 0L
-        private set
+
 
     lateinit var model:CartesianChartModel
 
@@ -64,7 +64,6 @@ class CameraViewModel @Inject constructor(
                 if(cameraModeState.recordingState is RecordingState.Started){
                     cameraModeState = CameraModeState.Video(RecordingState.Stopped)
                    camera.closeRecoding()
-                    startTimeOfRecording=0L
 
                     viewModelScope.launch {
 
@@ -145,17 +144,18 @@ class CameraViewModel @Inject constructor(
 
         val happy = dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
 
-        _x=happy.keys.toMutableList()
-        _y= happy.values.map {
+        val happyTimeSeries=dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
 
-            it.toMutableList()
-        }.flatten().toMutableList()
+        val aveage = happyTimeSeries.map {
+
+            it.key to it.value
+        }.toMap()
 
         model= CartesianChartModel(
 
                 ColumnCartesianLayerModel.build {
 
-                    series(x = _x, y = _y)
+                    series(x = aveage.keys, y =(1..100).toList())
                 }
         )
 

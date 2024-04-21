@@ -71,7 +71,10 @@ class MlKitFaceDetector @Inject constructor(
                     if (width > 0 && height > 0) {
                         val croppedFace = Bitmap.createBitmap(bitmap, x, y, width, height)
 
-                        val  faceEmotionArray =emotionClassifier.classify(croppedFace,false)
+                        var  faceEmotionArray =emotionClassifier.classify(croppedFace,false)
+                        faceEmotionArray=faceEmotionArray.map {
+                            it*100
+                        }.toFloatArray()
                         emotionsOfAllFacesInFrame.add(faceEmotionArray)
 
                         emotionMapOfFrame.forEach { (key,value)->

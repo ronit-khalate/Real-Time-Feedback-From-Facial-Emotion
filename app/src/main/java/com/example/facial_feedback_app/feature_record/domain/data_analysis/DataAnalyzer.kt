@@ -25,12 +25,14 @@ class DataAnalyzer @Inject constructor(
     var overAllEmotions:MutableList<Long> = mutableListOf()
         private set
 
+
+
     // Time series Emotion collection
     /**
      * List<FloatArray> is used because each frame may have multiple faces
      * to each face has one float array for its emotions
      * */
-    val timeSeriesEmotionCollection:MutableMap<Long,List<FloatArray>> = mutableMapOf()
+    val timeSeriesEmotionCollection:MutableMap<Long,EmotionProbabilitiesPerFrame> = mutableMapOf()
 
 
 
@@ -38,19 +40,30 @@ class DataAnalyzer @Inject constructor(
     * This method gives time series of particular emotions
     * Need Emotions enums object
     * */
-    fun getEmotionTimeSeriesData(emotion: Emotions): Map<Long, FloatArray> {
-
-
+    fun getEmotionTimeSeriesData(emotion: Emotions): Map<Long, List<Float>> {
 
         return timeSeriesEmotionCollection.map {
-            it.key to it.value[emotion.ordinal]
+
+            it.key to it.value.getEmotionProbabilityList(emotion)
         }.toMap()
+
 
     }
 
 
+
+
     fun updateData(time:Long,emotionMap:List<FloatArray>){
-        timeSeriesEmotionCollection[time] = emotionMap
+
+        val emotionsProbaPerFrame = EmotionProbabilitiesPerFrame().apply {
+
+            addEmotionProbabilitiesOfFace(emotionMap)
+        }
+
+        Log.i("InfoEmotion","$time -> ${emotionsProbaPerFrame.getEmotionProbabilityList(Emotions.HAPPY).toString()}")
+
+
+        timeSeriesEmotionCollection[time] = emotionsProbaPerFrame
 
 
     }

@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import com.example.facial_feedback_app.R
 import com.example.facial_feedback_app.feature_record.presentation.utils.CameraPreview
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.onCompletion
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -119,7 +120,12 @@ fun CameraScreen(
 
     LaunchedEffect(key1 = Unit) {
 
-        viewmodel.dataAnalyzer.imageProxyFlow(cameraController, context, viewmodel).buffer().collect {
+        viewmodel.dataAnalyzer.imageProxyFlow(cameraController, context, viewmodel)
+            .buffer()
+            .onCompletion {
+                viewmodel.startTimeOfRecording=0L
+            }
+            .collect {
 
             viewmodel.analyzeFrame(it)
         }
