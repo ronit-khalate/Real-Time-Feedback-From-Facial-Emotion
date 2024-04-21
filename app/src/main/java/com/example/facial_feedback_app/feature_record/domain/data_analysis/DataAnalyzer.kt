@@ -10,6 +10,7 @@ import com.example.facial_feedback_app.feature_record.domain.Emotions
 import com.example.facial_feedback_app.feature_record.presentation.camera.CameraViewModel
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
 import com.example.facial_feedback_app.utils.MlKitFaceDetector
+import com.example.facial_feedback_app.utils.toRotatedBitmap
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -71,7 +72,7 @@ class DataAnalyzer @Inject constructor(
             imageProxy.use {
                 if(viewModel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
 
-                    trySend(imageProxy.toBitmap())
+                    trySend(imageProxy.toRotatedBitmap())
                 }
             }
 
