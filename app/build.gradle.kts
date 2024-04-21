@@ -121,7 +121,7 @@ dependencies {
 
     // Vico chart
 
-    val vico_version = "c2.0.0-alpha.15"
+    val vico_version = "2.0.0-alpha.15"
     implementation("com.patrykandpatrick.vico:compose-m3:$vico_version")
 
 

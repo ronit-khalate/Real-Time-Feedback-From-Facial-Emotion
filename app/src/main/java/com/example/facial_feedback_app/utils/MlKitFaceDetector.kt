@@ -2,7 +2,6 @@ package com.example.facial_feedback_app.utils
 
 import android.graphics.Bitmap
 import android.util.Log
-import com.example.facial_feedback_app.feature_record.domain.FaceBoundInfo
 import com.example.facial_feedback_app.feature_record.domain.classifer.EmotionClassifierImpl
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
@@ -37,7 +36,10 @@ class MlKitFaceDetector @Inject constructor(
 
     fun getFacesFromCapturedImage(
         bitmap: Bitmap,
-    ):List<FloatArray>{
+        onAllFacesGet:(List<FloatArray>)->Unit
+    ){
+
+
 
         val image = InputImage.fromBitmap(bitmap, 0)
 
@@ -64,13 +66,6 @@ class MlKitFaceDetector @Inject constructor(
                     val y :Int= boundingBox.top.coerceAtLeast(0)
                     val width = boundingBox.width().coerceAtMost(bitmap.width - x)
                     val height = boundingBox.height().coerceAtMost(bitmap.height - y)
-                    val faceBound = FaceBoundInfo(
-                            x=x,
-                            y=y,
-                            width=width,
-                            height=height,
-                            boundingBox=boundingBox
-                    )
 
 //                     Create a new Bitmap with the corrected dimensions
                     if (width > 0 && height > 0) {
@@ -96,6 +91,7 @@ class MlKitFaceDetector @Inject constructor(
                 emotionMapOfFrame.clear()
 
                 faceBitmapList.clear()
+                onAllFacesGet(emotionsOfAllFacesInFrame)
 
 
 
@@ -104,7 +100,9 @@ class MlKitFaceDetector @Inject constructor(
                 Log.e("Detect", it.message.toString())
             }
 
-        return  emotionsOfAllFacesInFrame
+
+
+
 
     }
 }

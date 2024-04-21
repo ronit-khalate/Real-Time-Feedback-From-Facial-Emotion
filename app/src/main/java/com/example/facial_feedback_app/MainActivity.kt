@@ -13,12 +13,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.facial_feedback_app.core.permissions.PermissionManager
 import com.example.facial_feedback_app.feature_record.presentation.BottomNavItem
-import com.example.facial_feedback_app.feature_record.presentation.utils.BottomNavigationBar
 import com.example.facial_feedback_app.feature_record.presentation.camera.CameraScreen
 import com.example.facial_feedback_app.feature_record.presentation.camera.CameraViewModel
-import com.example.facial_feedback_app.feature_record.presentation.storage.StorageReview
-import com.example.facial_feedback_app.core.permissions.PermissionManager
+import com.example.facial_feedback_app.feature_record.presentation.storage.AnalyticsScreen
+import com.example.facial_feedback_app.feature_record.presentation.utils.BottomNavigationBar
 import com.example.facial_feedback_app.ui.theme.FacialFeedbackTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
                             }
 
                             composable(route = BottomNavItem.storage.screen_route){
-                                StorageReview(cameraViewModel=cameraViewModel)
+                                AnalyticsScreen(cameraViewModel=cameraViewModel)
                             }
 
 

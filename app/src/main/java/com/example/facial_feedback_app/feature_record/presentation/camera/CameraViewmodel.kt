@@ -2,33 +2,39 @@ package com.example.facial_feedback_app.feature_record.presentation.camera
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.facial_feedback_app.feature_record.domain.Camera
-import com.example.facial_feedback_app.feature_record.domain.StorageImage
+import com.example.facial_feedback_app.feature_record.domain.Emotions
 import com.example.facial_feedback_app.feature_record.domain.data_analysis.DataAnalyzer
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.CameraModeState
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
 import com.example.facial_feedback_app.utils.MlKitFaceDetector
 import com.google.mlkit.vision.face.Face
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModel
+import com.patrykandpatrick.vico.core.cartesian.data.ColumnCartesianLayerModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CameraViewModel @Inject constructor(
         val mlKitFaceDetector: MlKitFaceDetector,
         val camera: Camera,
-        val dataAnalyzer: DataAnalyzer
+        val dataAnalyzer: DataAnalyzer,
 ):ViewModel() {
 
 
     var startTimeOfRecording:Long = 0L
         private set
+
+    lateinit var model:CartesianChartModel
 
 
 
@@ -39,8 +45,7 @@ class CameraViewModel @Inject constructor(
     private var emotionSumMap:MutableMap<Int,Float> = mutableMapOf()
 
 
-    private val _bitmaps = MutableStateFlow<List<StorageImage>>(emptyList())
-    var bitmaps = _bitmaps.asStateFlow()
+
 
     private val _faceList = MutableStateFlow<List<Face>>(emptyList())
 
@@ -48,9 +53,7 @@ class CameraViewModel @Inject constructor(
 
     var loading by mutableStateOf(false)
 
-    fun addFaces(faces:List<StorageImage>){
-        _bitmaps.value+=faces
-    }
+
 
     // Starting video recording or capturing image
     fun onStart(controller: LifecycleCameraController,context: Context){
@@ -62,6 +65,13 @@ class CameraViewModel @Inject constructor(
                     cameraModeState = CameraModeState.Video(RecordingState.Stopped)
                    camera.closeRecoding()
                     startTimeOfRecording=0L
+
+                    viewModelScope.launch {
+
+                        analyze()
+                    }.invokeOnCompletion {
+
+                    }
 
                 }
                 else{
@@ -120,8 +130,36 @@ class CameraViewModel @Inject constructor(
 
     fun analyzeFrame(bitmap: Bitmap){
 
-        val emotionsOfFaces =  mlKitFaceDetector.getFacesFromCapturedImage(bitmap)
-        dataAnalyzer.updateData(System.currentTimeMillis()-startTimeOfRecording,emotionsOfFaces)
+        Log.d("analyzeFrame",bitmap.toString())
+
+        mlKitFaceDetector.getFacesFromCapturedImage(bitmap){
+
+            dataAnalyzer.updateData(System.currentTimeMillis()-startTimeOfRecording,it)
+        }
+    }
+
+    suspend fun analyze(){
+
+        var _x = mutableListOf<Long>()
+        var _y= mutableListOf<Float>()
+
+        val happy = dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
+
+        _x=happy.keys.toMutableList()
+        _y= happy.values.map {
+
+            it.toMutableList()
+        }.flatten().toMutableList()
+
+        model= CartesianChartModel(
+
+                ColumnCartesianLayerModel.build {
+
+                    series(x = _x, y = _y)
+                }
+        )
+
+
     }
 
 
