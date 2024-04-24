@@ -1,14 +1,13 @@
 package com.example.facial_feedback_app.feature_record.presentation.camera
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.util.Log
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.example.facial_feedback_app.feature_record.domain.BitmapTimeStampWrapper
 import com.example.facial_feedback_app.feature_record.domain.Camera
 import com.example.facial_feedback_app.feature_record.domain.Emotions
 import com.example.facial_feedback_app.feature_record.domain.data_analysis.DataAnalyzer
@@ -20,7 +19,7 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModel
 import com.patrykandpatrick.vico.core.cartesian.data.ColumnCartesianLayerModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,7 +30,8 @@ class CameraViewModel @Inject constructor(
 ):ViewModel() {
 
 
-    var startTimeOfRecording:Long = 0L
+    var startTimeOfRecordingInSeconds:Long = 0L
+        private set
 
 
     lateinit var model:CartesianChartModel
@@ -65,16 +65,10 @@ class CameraViewModel @Inject constructor(
                     cameraModeState = CameraModeState.Video(RecordingState.Stopped)
                    camera.closeRecoding()
 
-                    viewModelScope.launch {
-
-                        analyze()
-                    }.invokeOnCompletion {
-
-                    }
-
                 }
                 else{
                     cameraModeState = CameraModeState.Video(RecordingState.Started)
+                    startTimeOfRecordingInSeconds=TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
                     recordVideo(controller, context)
 
                 }
@@ -113,7 +107,7 @@ class CameraViewModel @Inject constructor(
         context: Context
     ){
 
-        startTimeOfRecording=System.currentTimeMillis()
+        startTimeOfRecordingInSeconds=System.currentTimeMillis()
         camera.recordVideo(controller=controller, context = context)
     }
 
@@ -127,13 +121,13 @@ class CameraViewModel @Inject constructor(
        }
     }
 
-    fun analyzeFrame(bitmap: Bitmap){
+    fun analyzeFrame(bitmapTimeStampWrapper: BitmapTimeStampWrapper){
 
-        Log.d("analyzeFrame",bitmap.toString())
+        Log.d("analyzeFrame","${bitmapTimeStampWrapper.timeStampInSeconds} - ${startTimeOfRecordingInSeconds/1000} = ${ (bitmapTimeStampWrapper.timeStampInSeconds-startTimeOfRecordingInSeconds/1000)}")
 
-        mlKitFaceDetector.getFacesFromCapturedImage(bitmap){
+        mlKitFaceDetector.getFacesFromCapturedImage(bitmapTimeStampWrapper.bitmap){
 
-            dataAnalyzer.updateData(System.currentTimeMillis()-startTimeOfRecording,it)
+            dataAnalyzer.updateData(bitmapTimeStampWrapper.timeStampInSeconds-startTimeOfRecordingInSeconds/1000, it)
         }
     }
 
@@ -148,7 +142,7 @@ class CameraViewModel @Inject constructor(
 
         val aveage = happyTimeSeries.map {
 
-            it.key to it.value
+            it.key/1000 to it.value
         }.toMap()
 
         model= CartesianChartModel(

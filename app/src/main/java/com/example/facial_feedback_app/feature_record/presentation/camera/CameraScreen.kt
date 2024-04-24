@@ -1,5 +1,6 @@
 package com.example.facial_feedback_app.feature_record.presentation.camera
 
+import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -47,11 +48,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.facial_feedback_app.R
 import com.example.facial_feedback_app.feature_record.presentation.utils.CameraPreview
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.timeout
+import java.util.concurrent.TimeoutException
+import kotlin.time.Duration.Companion.milliseconds
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
 @Composable
 fun CameraScreen(
     viewmodel: CameraViewModel,
@@ -83,28 +90,8 @@ fun CameraScreen(
                     CameraController.IMAGE_ANALYSIS
             )
 
-//            setImageAnalysisAnalyzer(
-//                    ContextCompat.getMainExecutor(context),
-//                    MlKitAnalyzer(
-//                            listOf(viewmodel.mlKitFaceDetector.mlKitFaceDetector),
-//                            ImageAnalysis.COORDINATE_SYSTEM_ORIGINAL,
-//                            ContextCompat.getMainExecutor(context)
-//                    ) { result: MlKitAnalyzer.Result? ->
-//
-//                        result?.getValue(viewmodel.mlKitFaceDetector.mlKitFaceDetector).let {faceList->
-//                            if (viewmodel.cameraModeState.recordingState is RecordingState.Started && this.isRecording) {
-//
-//                                faceList?.let {
-//                                    viewmodel.updateFaceListFlow(it)
-//                                } ?: viewmodel.updateFaceListFlow(emptyList())
-//                            }
-//                        }
-//
-//
-//                    }.apply {
-//                        defaultTargetResolution
-//                    }
-//            )
+
+
 
 
 
@@ -115,20 +102,38 @@ fun CameraScreen(
         }
     }
 
-
-
-
-    LaunchedEffect(key1 = Unit) {
-
+    val flow = remember {
         viewmodel.dataAnalyzer.imageProxyFlow(cameraController, context, viewmodel)
-            .buffer()
-            .onCompletion {
-                viewmodel.startTimeOfRecording=0L
-            }
-            .collect {
+    }
 
-            viewmodel.analyzeFrame(it)
-        }
+
+
+
+    LaunchedEffect(key1 = viewmodel.cameraModeState.recordingState) {
+
+                flow
+                    .buffer()
+                    .timeout(400.milliseconds)
+                    .catch {
+
+                        if (it is TimeoutCancellationException) {
+                            // Throw a custom exception to be caught by the catch block
+                            throw TimeoutException("Flow did not emit within 400 milliseconds")
+                        }
+
+                    }
+                    .onCompletion {
+                        if (it is TimeoutException) {
+                            Log.d("sani", "cancel")
+                            viewmodel.analyze()
+                        }
+                    }
+                    .collect {
+
+                        Log.d("yash", it.timeStampInSeconds.toString())
+                        viewmodel.analyzeFrame(it)
+                    }
+
     }
     //TODO
         // Delete this when imageProxyFlow works
