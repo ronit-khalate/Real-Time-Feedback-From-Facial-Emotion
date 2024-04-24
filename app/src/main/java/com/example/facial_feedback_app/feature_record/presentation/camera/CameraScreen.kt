@@ -109,7 +109,7 @@ fun CameraScreen(
 
 
 
-    LaunchedEffect(key1 = viewmodel.cameraModeState.recordingState) {
+    LaunchedEffect(key1 =Unit) {
 
                 flow
                     .buffer()
