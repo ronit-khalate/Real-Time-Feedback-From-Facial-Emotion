@@ -24,30 +24,30 @@ fun BottomNavigationBar(
 
 ){
 
-    var selected by remember{ mutableStateOf<BottomNavItem>(BottomNavItem.image) }
+    var selected by remember{ mutableStateOf<BottomNavItem>(BottomNavItem.Camera) }
 
    NavigationBar(
            modifier = Modifier
                .height(50.dp)
    ) {
        NavigationBarItem(
-               selected = selected is BottomNavItem.image,
+               selected = selected is BottomNavItem.Camera,
                onClick = {
-                   if(selected  !is BottomNavItem.image){
+                   if(selected  !is BottomNavItem.Camera){
 
                        onCameraClick()
-                       selected= BottomNavItem.image
+                       selected= BottomNavItem.Camera
                    }
               },
-               icon = { Icon(imageVector = ImageVector.vectorResource(id = BottomNavItem.image.icon), contentDescription ="" ) }
+               icon = { Icon(imageVector = ImageVector.vectorResource(id = BottomNavItem.Camera.icon), contentDescription ="" ) }
        )
 
        NavigationBarItem(
-               selected = selected is BottomNavItem.storage,
+               selected = selected is BottomNavItem.Analytics,
                onClick = {
                    onStorageClick()
-                   selected = BottomNavItem.storage
+                   selected = BottomNavItem.Analytics
                          },
-               icon = { Icon(imageVector = ImageVector.vectorResource(id = BottomNavItem.storage.icon), contentDescription = "")})
+               icon = { Icon(imageVector = ImageVector.vectorResource(id = BottomNavItem.Analytics.icon), contentDescription = "")})
    }
 }

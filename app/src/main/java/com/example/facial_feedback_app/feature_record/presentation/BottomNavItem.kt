@@ -8,8 +8,7 @@ sealed class BottomNavItem(
         var screen_route:String
 
 ){
-    object image : BottomNavItem("Image", icon =R.drawable.photo_camera, "photo")
+    object Camera : BottomNavItem(title = "Image", icon =R.drawable.photo_camera, "photo")
 
-    object video : BottomNavItem("Video", R.drawable.videocam, "video")
-    object storage: BottomNavItem("Storage", R.drawable.storage, "storage")
+    object Analytics: BottomNavItem(title = "Storage" ,icon= R.drawable.storage, "storage")
 }

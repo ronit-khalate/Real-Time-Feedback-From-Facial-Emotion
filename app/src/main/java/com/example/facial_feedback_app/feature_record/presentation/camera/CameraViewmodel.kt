@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.facial_feedback_app.feature_record.domain.BitmapTimeStampWrapper
 import com.example.facial_feedback_app.feature_record.domain.Camera
 import com.example.facial_feedback_app.feature_record.domain.Emotions
@@ -18,7 +19,9 @@ import com.google.mlkit.vision.face.Face
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModel
 import com.patrykandpatrick.vico.core.cartesian.data.ColumnCartesianLayerModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -34,7 +37,7 @@ class CameraViewModel @Inject constructor(
         private set
 
 
-    lateinit var model:CartesianChartModel
+    var model:CartesianChartModel ?=null
 
 
 
@@ -64,6 +67,9 @@ class CameraViewModel @Inject constructor(
                 if(cameraModeState.recordingState is RecordingState.Started){
                     cameraModeState = CameraModeState.Video(RecordingState.Stopped)
                    camera.closeRecoding()
+                    viewModelScope.launch(Dispatchers.Default){
+                        analyze()
+                    }
 
                 }
                 else{
@@ -133,23 +139,21 @@ class CameraViewModel @Inject constructor(
 
     suspend fun analyze(){
 
-        var _x = mutableListOf<Long>()
-        var _y= mutableListOf<Float>()
 
-        val happy = dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
-
-        val happyTimeSeries=dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
+        val happyTimeSeries: Map<Long, List<Float>> =dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
 
         val aveage = happyTimeSeries.map {
 
-            it.key/1000 to it.value
+            it.key to (it.value.average())
+
         }.toMap()
+
 
         model= CartesianChartModel(
 
                 ColumnCartesianLayerModel.build {
 
-                    series(x = aveage.keys, y =(1..100).toList())
+                    series(x = aveage.keys, y =aveage.values)
                 }
         )
 

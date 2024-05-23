@@ -7,14 +7,21 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MlKitFaceDetector @Inject constructor(
     private val emotionClassifier: EmotionClassifierImpl
 ) {
 
+
+
+    val classifierScope = CoroutineScope(Dispatchers.Default + Job())
 
 
     // Face Detection model parameter
@@ -43,58 +50,17 @@ class MlKitFaceDetector @Inject constructor(
 
         val image = InputImage.fromBitmap(bitmap, 0)
 
-        val faceBitmapList:MutableList<Bitmap> = mutableListOf()
-        val emotionMapOfFrame:MutableMap<Int,Float> = mutableMapOf()
 
-        val emotionsOfAllFacesInFrame:MutableList<FloatArray> = mutableListOf()
         mlKitFaceDetector.process(image)
             .addOnSuccessListener { faces->
 
-                if(faces.isNotEmpty())
-                 _faceBoundFlow.update { faces }
-                else
-                    _faceBoundFlow.update { emptyList() }
-
-                Log.d("Success", "${faces.size}")
-                faces.forEach {face->
-                    val boundingBox = face.boundingBox
-
-
-
-                  // Ensure that bounding box coordinates are within the bounds of the original bitmap
-                    val x :Int= boundingBox.left.coerceAtLeast(0)
-                    val y :Int= boundingBox.top.coerceAtLeast(0)
-                    val width = boundingBox.width().coerceAtMost(bitmap.width - x)
-                    val height = boundingBox.height().coerceAtMost(bitmap.height - y)
-
-//                     Create a new Bitmap with the corrected dimensions
-                    if (width > 0 && height > 0) {
-                        val croppedFace = Bitmap.createBitmap(bitmap, x, y, width, height)
-
-                        var  faceEmotionArray =emotionClassifier.classify(croppedFace,false)
-                        faceEmotionArray=faceEmotionArray.map {
-                            it*100
-                        }.toFloatArray()
-                        emotionsOfAllFacesInFrame.add(faceEmotionArray)
-
-                        emotionMapOfFrame.forEach { (key,value)->
-
-                           emotionMapOfFrame[key]= emotionMapOfFrame.getOrDefault(key,0.0F) + value
-                        }
-
-
-                        faceBitmapList.add(croppedFace)
-
-
-                    }
-
+                classifierScope.launch {
+                    classify(
+                            faces = faces,
+                            bitmap=bitmap,
+                            onAllFacesGet = onAllFacesGet
+                    )
                 }
-
-
-                emotionMapOfFrame.clear()
-
-                faceBitmapList.clear()
-                onAllFacesGet(emotionsOfAllFacesInFrame)
 
 
 
@@ -107,5 +73,59 @@ class MlKitFaceDetector @Inject constructor(
 
 
 
+    }
+
+
+
+    private suspend fun classify(faces:List<Face>,bitmap: Bitmap,onAllFacesGet:(List<FloatArray>)->Unit){
+
+        Log.d("MLKIT", "${faces.size}")
+        val emotionMapOfFrame:MutableMap<Int,Float> = mutableMapOf()
+
+        val emotionsOfAllFacesInFrame:MutableList<FloatArray> = mutableListOf()
+
+        if(faces.isNotEmpty())
+            _faceBoundFlow.update { faces }
+        else
+            _faceBoundFlow.update { emptyList() }
+
+        faces.forEach {face->
+            val boundingBox = face.boundingBox
+
+
+
+            // Ensure that bounding box coordinates are within the bounds of the original bitmap
+            val x :Int= boundingBox.left.coerceAtLeast(0)
+            val y :Int= boundingBox.top.coerceAtLeast(0)
+            val width = boundingBox.width().coerceAtMost(bitmap.width - x)
+            val height = boundingBox.height().coerceAtMost(bitmap.height - y)
+
+//                     Create a new Bitmap with the corrected dimensions
+            if (width > 0 && height > 0) {
+                val croppedFace = Bitmap.createBitmap(bitmap, x, y, width, height)
+
+                var  faceEmotionArray =emotionClassifier.classify(croppedFace,false)
+                faceEmotionArray=faceEmotionArray.map {
+                    it*100
+                }.toFloatArray()
+                emotionsOfAllFacesInFrame.add(faceEmotionArray)
+
+                emotionMapOfFrame.forEach { (key,value)->
+
+                    emotionMapOfFrame[key]= emotionMapOfFrame.getOrDefault(key,0.0F) + value
+                }
+
+
+
+            }
+
+        }
+
+
+        emotionMapOfFrame.clear()
+
+        onAllFacesGet(emotionsOfAllFacesInFrame)
+
+        Log.d("MLKIT", "${faces.size}")
     }
 }
