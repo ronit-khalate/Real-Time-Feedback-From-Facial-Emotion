@@ -49,13 +49,7 @@ import androidx.compose.ui.unit.sp
 import com.example.facial_feedback_app.R
 import com.example.facial_feedback_app.feature_record.presentation.utils.CameraPreview
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.timeout
-import java.util.concurrent.TimeoutException
-import kotlin.time.Duration.Companion.milliseconds
 
 
 @OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
@@ -113,21 +107,6 @@ fun CameraScreen(
 
                 flow
                     .buffer()
-                    .timeout(400.milliseconds)
-                    .catch {
-
-                        if (it is TimeoutCancellationException) {
-                            // Throw a custom exception to be caught by the catch block
-                            throw TimeoutException("Flow did not emit within 400 milliseconds")
-                        }
-
-                    }
-                    .onCompletion {
-                        if (it is TimeoutException) {
-                            Log.d("sani", "cancel")
-                            viewmodel.analyze()
-                        }
-                    }
                     .collect {
 
                         Log.d("yash", it.timeStampInSeconds.toString())

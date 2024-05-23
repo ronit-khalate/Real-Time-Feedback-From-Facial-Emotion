@@ -27,38 +27,44 @@ fun AnalyticsScreen(
     cameraViewModel: CameraViewModel
 ){
 
-    CartesianChartHost(
-            chart = rememberCartesianChart(
-
-                rememberColumnCartesianLayer(
 
 
-                    ColumnCartesianLayer.ColumnProvider.series(
+        CartesianChartHost(
+                chart = rememberCartesianChart(
 
-                        rememberLineComponent(
-                                color = Color(0xffff5500),
-                                thickness = 16.dp,
-                                shape = remember { Shape.rounded(allPercent = 40) },
+                        rememberColumnCartesianLayer(
+
+
+                                ColumnCartesianLayer.ColumnProvider.series(
+
+                                        rememberLineComponent(
+                                                color = Color(0xffff5500),
+                                                thickness = 16.dp,
+                                                shape = remember { Shape.rounded(allPercent = 40) },
+                                        ),
+
+                                        ),
+
+                                ),
+                        startAxis = rememberStartAxis(),
+                        bottomAxis = rememberBottomAxis(
+
+                                itemPlacer = remember {
+                                    AxisItemPlacer.Horizontal.default(
+                                            spacing = 3,
+                                            addExtremeLabelPadding = true
+                                    )
+                                }
                         ),
 
-                    ),
 
-                ),
-                startAxis = rememberStartAxis(),
-                bottomAxis =  rememberBottomAxis(
+                        ),
 
-                        itemPlacer =  remember {
-                            AxisItemPlacer.Horizontal.default(spacing = 3, addExtremeLabelPadding = true)
-                        }
-                ),
+                marker = rememberDefaultCartesianMarker(label = TextComponent.build()),
+                horizontalLayout = HorizontalLayout.fullWidth(),
+                model = cameraViewModel.model!!,
+                scrollState = rememberVicoScrollState(),
+                zoomState = rememberVicoZoomState()
+        )
 
-
-            ),
-
-            marker = rememberDefaultCartesianMarker(label = TextComponent.build()),
-            horizontalLayout = HorizontalLayout.fullWidth(),
-            model =cameraViewModel.model,
-            scrollState = rememberVicoScrollState(),
-            zoomState = rememberVicoZoomState()
-    )
 }

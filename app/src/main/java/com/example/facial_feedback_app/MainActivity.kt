@@ -51,10 +51,10 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         BottomNavigationBar(
                                 onCameraClick = {
-                                    navController.navigate(BottomNavItem.image.screen_route)
+                                    navController.navigate(BottomNavItem.Camera.screen_route)
                                 },
                                 onStorageClick = {
-                                    navController.navigate(BottomNavItem.storage.screen_route)
+                                    navController.navigate(BottomNavItem.Analytics.screen_route)
                                 }
                         )
                     }
@@ -65,15 +65,15 @@ class MainActivity : ComponentActivity() {
                                 .padding(it)
                     ) {
 
-                        NavHost(navController = navController, startDestination = BottomNavItem.image.screen_route){
+                        NavHost(navController = navController, startDestination = BottomNavItem.Camera.screen_route){
 
-                            composable(route = BottomNavItem.image.screen_route){
+                            composable(route = BottomNavItem.Camera.screen_route){
                                 CameraScreen(
                                         viewmodel = cameraViewModel
                                 )
                             }
 
-                            composable(route = BottomNavItem.storage.screen_route){
+                            composable(route = BottomNavItem.Analytics.screen_route){
                                 AnalyticsScreen(cameraViewModel=cameraViewModel)
                             }
 

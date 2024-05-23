@@ -26,6 +26,8 @@ class DataAnalyzer @Inject constructor(
     var overAllEmotions:MutableList<Long> = mutableListOf()
         private set
 
+    var frameCount =0;
+
 
 
     // Time series Emotion collection
@@ -85,36 +87,26 @@ class DataAnalyzer @Inject constructor(
 
         cameraController.setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context)){imageProxy: ImageProxy ->
 
+            frameCount++
 
             imageProxy.use {
-                if(viewModel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
+
+                if (frameCount%10==0) {
+
+                    frameCount=0
+                    if (viewModel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording) {
 
 
-                    trySend(BitmapTimeStampWrapper(it.toRotatedBitmap(), TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())))
+                        trySend(
+                                BitmapTimeStampWrapper(
+                                        it.toRotatedBitmap(),
+                                        TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+                                )
+                        )
+                    }
                 }
 
             }
-
-
-
-
-
-
-//            imageProxy.use {
-//                if(viewModel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
-//
-//                    viewModel.mlKitFaceDetector.getFacesFromCapturedImage(it.toRotatedBitmap()){emotionMapOfFrame:Map<Int,Float>->
-//
-//
-//
-//                        viewModel.updateEmotionSumMap(emotionMapOfFrame)
-//
-//
-//
-//                    }
-//                }
-//            }
-
 
 
         }
