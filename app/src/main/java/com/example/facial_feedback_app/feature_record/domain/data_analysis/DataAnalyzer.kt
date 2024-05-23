@@ -75,10 +75,8 @@ class DataAnalyzer @Inject constructor(
 
     }
 
-    fun analyze(time:Long,emotionMap:List<Long>){
 
 
-    }
 
 
     fun imageProxyFlow(cameraController: LifecycleCameraController,context:Context,viewModel: CameraViewModel):Flow<BitmapTimeStampWrapper> = callbackFlow{

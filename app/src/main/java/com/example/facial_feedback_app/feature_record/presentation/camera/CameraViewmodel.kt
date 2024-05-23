@@ -14,10 +14,12 @@ import com.example.facial_feedback_app.feature_record.domain.Emotions
 import com.example.facial_feedback_app.feature_record.domain.data_analysis.DataAnalyzer
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.CameraModeState
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
+import com.example.facial_feedback_app.feature_record.presentation.storage.state.SingleEmotionAnalyticsCharModels
 import com.example.facial_feedback_app.utils.MlKitFaceDetector
 import com.google.mlkit.vision.face.Face
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModel
 import com.patrykandpatrick.vico.core.cartesian.data.ColumnCartesianLayerModel
+import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,11 +35,12 @@ class CameraViewModel @Inject constructor(
 ):ViewModel() {
 
 
-    var startTimeOfRecordingInSeconds:Long = 0L
+    private var startTimeOfRecordingInSeconds:Long = 0L
         private set
 
 
-    var model:CartesianChartModel ?=null
+    var chartModelState by mutableStateOf(SingleEmotionAnalyticsCharModels())
+        private set
 
 
 
@@ -142,19 +145,32 @@ class CameraViewModel @Inject constructor(
 
         val happyTimeSeries: Map<Long, List<Float>> =dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
 
-        val aveage = happyTimeSeries.map {
+        val happyTimeSeriesAverage = happyTimeSeries.map {
 
             it.key to (it.value.average())
 
         }.toMap()
 
 
-        model= CartesianChartModel(
+        val columnCharModel= CartesianChartModel(
 
                 ColumnCartesianLayerModel.build {
 
-                    series(x = aveage.keys, y =aveage.values)
+                    series(x = happyTimeSeriesAverage.keys, y =happyTimeSeriesAverage.values)
                 }
+        )
+
+        val lineCharModel= CartesianChartModel(
+
+                LineCartesianLayerModel.build {
+
+                    series(x = happyTimeSeriesAverage.keys, y =happyTimeSeriesAverage.values)
+                }
+        )
+
+        chartModelState = chartModelState.copy(
+                columnChartModel = columnCharModel,
+                lineChartModel = lineCharModel
         )
 
 
