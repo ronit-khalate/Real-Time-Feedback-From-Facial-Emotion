@@ -1,8 +1,6 @@
 package com.example.facial_feedback_app.feature_record.presentation.camera
 
-import android.util.Log
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.Canvas
@@ -27,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,13 +45,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import com.example.facial_feedback_app.R
-import com.example.facial_feedback_app.feature_record.domain.StorageImage
-import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
 import com.example.facial_feedback_app.feature_record.presentation.utils.CameraPreview
-import com.example.facial_feedback_app.utils.toRotatedBitmap
-import com.google.mlkit.vision.face.Face
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.onCompletion
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -120,24 +116,42 @@ fun CameraScreen(
     }
 
 
-    cameraController.setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context)){imageProxy: ImageProxy ->
-        
-        Log.d("recording", cameraController.isRecording.toString())
-
-        if(viewmodel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
-
-            viewmodel.mlKitFaceDetector.getFacesFromCapturedImage(imageProxy.toRotatedBitmap()){faceBitmapList:List<StorageImage>,_faceList:List<Face>->
 
 
-                viewmodel.addFaces(faceBitmapList)
+    LaunchedEffect(key1 = Unit) {
 
-
-
+        viewmodel.dataAnalyzer.imageProxyFlow(cameraController, context, viewmodel)
+            .buffer()
+            .onCompletion {
+                viewmodel.startTimeOfRecording=0L
             }
-        }
-        imageProxy.close()
+            .collect {
 
+            viewmodel.analyzeFrame(it)
+        }
     }
+    //TODO
+        // Delete this when imageProxyFlow works
+
+//    cameraController.setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context)){imageProxy: ImageProxy ->
+//
+//        Log.d("recording", cameraController.isRecording.toString())
+//
+//        if(viewmodel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
+//
+//            viewmodel.mlKitFaceDetector.getFacesFromCapturedImage(imageProxy.toRotatedBitmap()){emotionMapOfFrame:Map<Int,Float>->
+//
+//
+//
+//                viewmodel.updateEmotionSumMap(emotionMapOfFrame)
+//
+//
+//
+//            }
+//        }
+//        imageProxy.close()
+//
+//    }
 
 
 

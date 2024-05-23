@@ -2,8 +2,6 @@ package com.example.facial_feedback_app.utils
 
 import android.graphics.Bitmap
 import android.util.Log
-import com.example.facial_feedback_app.feature_record.domain.FaceBoundInfo
-import com.example.facial_feedback_app.feature_record.domain.StorageImage
 import com.example.facial_feedback_app.feature_record.domain.classifer.EmotionClassifierImpl
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
@@ -16,6 +14,7 @@ import javax.inject.Inject
 class MlKitFaceDetector @Inject constructor(
     private val emotionClassifier: EmotionClassifierImpl
 ) {
+
 
 
     // Face Detection model parameter
@@ -33,16 +32,21 @@ class MlKitFaceDetector @Inject constructor(
 
 
     // Face Detector
-    val mlKitFaceDetector = FaceDetection.getClient(faceDetectorOptions)
+    private val mlKitFaceDetector = FaceDetection.getClient(faceDetectorOptions)
 
     fun getFacesFromCapturedImage(
         bitmap: Bitmap,
-        addFaceToList:(List<StorageImage>,List<Face>)->Unit
+        onAllFacesGet:(List<FloatArray>)->Unit
     ){
 
+
+
         val image = InputImage.fromBitmap(bitmap, 0)
-        val faceBitmapList:MutableList<StorageImage> = mutableListOf()
-        val facesList:MutableList<Face> = mutableListOf()
+
+        val faceBitmapList:MutableList<Bitmap> = mutableListOf()
+        val emotionMapOfFrame:MutableMap<Int,Float> = mutableMapOf()
+
+        val emotionsOfAllFacesInFrame:MutableList<FloatArray> = mutableListOf()
         mlKitFaceDetector.process(image)
             .addOnSuccessListener { faces->
 
@@ -62,46 +66,46 @@ class MlKitFaceDetector @Inject constructor(
                     val y :Int= boundingBox.top.coerceAtLeast(0)
                     val width = boundingBox.width().coerceAtMost(bitmap.width - x)
                     val height = boundingBox.height().coerceAtMost(bitmap.height - y)
-                    val faceBound = FaceBoundInfo(
-                            x=x,
-                            y=y,
-                            width=width,
-                            height=height,
-                            boundingBox=boundingBox
-                    )
 
 //                     Create a new Bitmap with the corrected dimensions
                     if (width > 0 && height > 0) {
                         val croppedFace = Bitmap.createBitmap(bitmap, x, y, width, height)
 
-                        val emotionmap =emotionClassifier.classify(croppedFace,false)
+                        var  faceEmotionArray =emotionClassifier.classify(croppedFace,false)
+                        faceEmotionArray=faceEmotionArray.map {
+                            it*100
+                        }.toFloatArray()
+                        emotionsOfAllFacesInFrame.add(faceEmotionArray)
 
-                        val firstThree= emotionmap
-                            .toList()
-                            .sortedByDescending { it.second }
-                            .take(3)
-                            .associate {
-                                Pair(it.first, it.second * 100)
-                            }
+                        emotionMapOfFrame.forEach { (key,value)->
 
-                        val storageImage = StorageImage(croppedFace, firstThree)
-                        faceBitmapList.add(storageImage)
-                        facesList.add(face)
+                           emotionMapOfFrame[key]= emotionMapOfFrame.getOrDefault(key,0.0F) + value
+                        }
+
+
+                        faceBitmapList.add(croppedFace)
+
 
                     }
 
                 }
 
-                addFaceToList(faceBitmapList.toList(),facesList.toList())
+
+                emotionMapOfFrame.clear()
 
                 faceBitmapList.clear()
-                facesList.clear()
+                onAllFacesGet(emotionsOfAllFacesInFrame)
+
 
 
             }
             .addOnFailureListener{
                 Log.e("Detect", it.message.toString())
             }
+
+
+
+
 
     }
 }

@@ -1,66 +1,64 @@
 package com.example.facial_feedback_app.feature_record.presentation.storage
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.facial_feedback_app.feature_record.presentation.camera.CameraViewModel
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
+import com.patrykandpatrick.vico.compose.cartesian.fullWidth
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
+import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
+import com.patrykandpatrick.vico.core.cartesian.axis.AxisItemPlacer
+import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
+import com.patrykandpatrick.vico.core.common.component.TextComponent
+import com.patrykandpatrick.vico.core.common.shape.Shape
 
 
 @Composable
-fun StorageReview(
+fun AnalyticsScreen(
     cameraViewModel: CameraViewModel
 ){
 
-    val bitmaplist = cameraViewModel.bitmaps.collectAsState().value
-    LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalItemSpacing = 16.dp,
-    ){
-        items(
-                items = bitmaplist
-        ){ bitmap ->
+    CartesianChartHost(
+            chart = rememberCartesianChart(
 
-            Column(
+                rememberColumnCartesianLayer(
 
-                    modifier = Modifier,
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
 
-            ) {
-                Image(
-                        bitmap = bitmap.image.asImageBitmap(),
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .height(100.dp)
-                            .width(100.dp),
-                        contentDescription =""
-                )
+                    ColumnCartesianLayer.ColumnProvider.series(
 
-                Spacer(modifier = Modifier.height(5.dp))
+                        rememberLineComponent(
+                                color = Color(0xffff5500),
+                                thickness = 16.dp,
+                                shape = remember { Shape.rounded(allPercent = 40) },
+                        ),
 
-                for (key in bitmap.emotion.keys){
+                    ),
 
-                    Text(text = "${key} = ${bitmap.emotion[key].toString().substring(0,5)}%")
-                }
+                ),
+                startAxis = rememberStartAxis(),
+                bottomAxis =  rememberBottomAxis(
 
-            }
+                        itemPlacer =  remember {
+                            AxisItemPlacer.Horizontal.default(spacing = 3, addExtremeLabelPadding = true)
+                        }
+                ),
 
-        }
-    }
+
+            ),
+
+            marker = rememberDefaultCartesianMarker(label = TextComponent.build()),
+            horizontalLayout = HorizontalLayout.fullWidth(),
+            model =cameraViewModel.model,
+            scrollState = rememberVicoScrollState(),
+            zoomState = rememberVicoZoomState()
+    )
 }

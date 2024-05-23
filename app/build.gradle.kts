@@ -115,5 +115,16 @@ dependencies {
 //    // Import the GPU delegate plugin Library for GPU inference
     implementation ("org.tensorflow:tensorflow-lite-gpu-delegate-plugin:0.4.4")
     implementation ("org.tensorflow:tensorflow-lite-gpu:2.14.0")
+
+    // Y chart
+    implementation("co.yml:ycharts:2.1.0")
+
+    // Vico chart
+
+    val vico_version = "2.0.0-alpha.15"
+    implementation("com.patrykandpatrick.vico:compose-m3:$vico_version")
+
+
+
 }
 
