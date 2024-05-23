@@ -140,13 +140,13 @@ class CameraViewModel @Inject constructor(
         }
     }
 
-    suspend fun analyze(){
+    suspend fun analyze(emotion: Emotions=Emotions.HAPPY){
 
 
 
-        val happyTimeSeries: Map<Long, List<Float>> =dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
+        val emotionTimeSeries: Map<Long, List<Float>> =dataAnalyzer.getEmotionTimeSeriesData(emotion)
 
-        val happyTimeSeriesAverage = happyTimeSeries.map {
+        val emotionTimeSeriesAverage = emotionTimeSeries.map {
 
             it.key to (it.value.average())
 
@@ -157,7 +157,7 @@ class CameraViewModel @Inject constructor(
 
                 ColumnCartesianLayerModel.build {
 
-                    series(x = happyTimeSeriesAverage.keys, y =happyTimeSeriesAverage.values)
+                    series(x = emotionTimeSeriesAverage.keys, y =emotionTimeSeriesAverage.values)
                 }
         )
 
@@ -165,7 +165,7 @@ class CameraViewModel @Inject constructor(
 
                 LineCartesianLayerModel.build {
 
-                    series(x = happyTimeSeriesAverage.keys, y =happyTimeSeriesAverage.values)
+                    series(x = emotionTimeSeriesAverage.keys, y =emotionTimeSeriesAverage.values)
                 }
         )
 

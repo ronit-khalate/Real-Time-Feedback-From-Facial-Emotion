@@ -24,7 +24,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import com.example.facial_feedback_app.feature_record.domain.Emotions
 import com.example.facial_feedback_app.feature_record.presentation.camera.CameraViewModel
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
@@ -52,6 +54,7 @@ import com.patrykandpatrick.vico.core.common.Dimensions
 import com.patrykandpatrick.vico.core.common.component.TextComponent
 import com.patrykandpatrick.vico.core.common.shader.DynamicShader
 import com.patrykandpatrick.vico.core.common.shape.Shape
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -71,6 +74,8 @@ fun SingleEmotionAnalyticsScreen(
 
         mutableStateOf(Emotions.HAPPY)
     }
+
+    val scope = LocalLifecycleOwner.current
 
 
 
@@ -145,6 +150,9 @@ fun SingleEmotionAnalyticsScreen(
                                     onClick = {
 
                                         selectedEmotion=emotions
+                                        scope.lifecycleScope.launch {
+                                            viewModel.analyze(emotions)
+                                        }
                                         isDropDownMenuExpanded=false
                                     }
                             )
