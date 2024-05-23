@@ -139,16 +139,12 @@ class CameraViewModel @Inject constructor(
 
     suspend fun analyze(){
 
-        var _x = mutableListOf<Long>()
-        var _y= mutableListOf<Float>()
-
-        val happy = dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
 
         val happyTimeSeries: Map<Long, List<Float>> =dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
 
         val aveage = happyTimeSeries.map {
 
-            it.key/1000 to it.value.average()
+            it.key to (it.value.average())
 
         }.toMap()
 
