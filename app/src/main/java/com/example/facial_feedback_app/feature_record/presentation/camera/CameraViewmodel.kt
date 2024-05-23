@@ -144,18 +144,19 @@ class CameraViewModel @Inject constructor(
 
         val happy = dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
 
-        val happyTimeSeries=dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
+        val happyTimeSeries: Map<Long, List<Float>> =dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
 
         val aveage = happyTimeSeries.map {
 
-            it.key to it.value
+            it.key/1000 to it.value.average()
         }.toMap()
+
 
         model= CartesianChartModel(
 
                 ColumnCartesianLayerModel.build {
 
-                    series(x = aveage.keys, y =(1..100).toList())
+                    series(x = aveage.keys, y =aveage.values)
                 }
         )
 
