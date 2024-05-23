@@ -143,6 +143,7 @@ class CameraViewModel @Inject constructor(
     suspend fun analyze(){
 
 
+
         val happyTimeSeries: Map<Long, List<Float>> =dataAnalyzer.getEmotionTimeSeriesData(Emotions.HAPPY)
 
         val happyTimeSeriesAverage = happyTimeSeries.map {
