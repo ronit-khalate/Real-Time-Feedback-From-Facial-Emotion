@@ -117,25 +117,7 @@ fun CameraScreen(
     //TODO
         // Delete this when imageProxyFlow works
 
-//    cameraController.setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context)){imageProxy: ImageProxy ->
-//
-//        Log.d("recording", cameraController.isRecording.toString())
-//
-//        if(viewmodel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording){
-//
-//            viewmodel.mlKitFaceDetector.getFacesFromCapturedImage(imageProxy.toRotatedBitmap()){emotionMapOfFrame:Map<Int,Float>->
-//
-//
-//
-//                viewmodel.updateEmotionSumMap(emotionMapOfFrame)
-//
-//
-//
-//            }
-//        }
-//        imageProxy.close()
-//
-//    }
+
 
 
 

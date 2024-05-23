@@ -91,7 +91,7 @@ class DataAnalyzer @Inject constructor(
 
             imageProxy.use {
 
-                if (frameCount%10==0) {
+                if (frameCount%30==0) {
 
                     frameCount=0
                     if (viewModel.cameraModeState.recordingState is RecordingState.Started && cameraController.isRecording) {
