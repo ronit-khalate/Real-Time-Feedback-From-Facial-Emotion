@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.facial_feedback_app.R
 import com.example.facial_feedback_app.feature_record.presentation.camera.CameraViewModel
+import com.example.facial_feedback_app.feature_record.presentation.storage.sections.CompositeEmotionAnalyticsScreen
 import com.example.facial_feedback_app.feature_record.presentation.storage.sections.SingleEmotionAnalyticsScreen
 
 
@@ -42,7 +43,11 @@ fun AnalyticsScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
     ) {
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = {
+            navController.navigate("Single"){
+                launchSingleTop=true
+            }
+        }) {
 
                 Image(
                         painter = painterResource(id = R.drawable.single) ,
@@ -50,7 +55,11 @@ fun AnalyticsScreen(
                 )
         }
 
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = {
+            navController.navigate("Combined"){
+                launchSingleTop=true
+            }
+        }) {
             Image(
                     painter = painterResource(id = R.drawable.combined) ,
                     contentDescription =null
@@ -74,7 +83,7 @@ fun AnalyticsScreen(
             }
 
             composable(route="Combined"){
-
+                CompositeEmotionAnalyticsScreen(viewModel = cameraViewModel)
             }
         }
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -18,8 +19,10 @@ import com.example.facial_feedback_app.feature_record.presentation.storage.state
 import com.example.facial_feedback_app.utils.MlKitFaceDetector
 import com.google.mlkit.vision.face.Face
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModel
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.ColumnCartesianLayerModel
 import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerModel
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,6 +63,15 @@ class CameraViewModel @Inject constructor(
     var loading by mutableStateOf(false)
 
 
+    // Composite Screen State
+
+    var compositeAnalyticsModel = CartesianChartModelProducer.build()
+
+
+    var addedEmotionsInCompositeAnalyticsState = mutableStateMapOf<Emotions,Map<Long,Double>>()
+        private set
+
+
 
     // Starting video recording or capturing image
     fun onStart(controller: LifecycleCameraController,context: Context){
@@ -71,7 +83,7 @@ class CameraViewModel @Inject constructor(
                     cameraModeState = CameraModeState.Video(RecordingState.Stopped)
                    camera.closeRecoding()
                     viewModelScope.launch(Dispatchers.Default){
-                        analyze()
+                        updateSingleEmotionAnalyticModelState()
                     }
 
                 }
@@ -140,7 +152,7 @@ class CameraViewModel @Inject constructor(
         }
     }
 
-    suspend fun analyze(emotion: Emotions=Emotions.HAPPY){
+    suspend fun updateSingleEmotionAnalyticModelState(emotion: Emotions=Emotions.HAPPY){
 
 
 
@@ -175,6 +187,51 @@ class CameraViewModel @Inject constructor(
         )
 
 
+    }
+
+
+    suspend fun addEmotionDataInCompositeChart(emotion: Emotions) {
+
+        addedEmotionsInCompositeAnalyticsState?.let { it ->
+
+
+            if (!it.containsKey(emotion)) {
+
+
+                val emotionTimeSeries: Map<Long, List<Float>> = dataAnalyzer.getEmotionTimeSeriesData(emotion)
+
+                val emotionTimeSeriesAverage = emotionTimeSeries.map {
+
+                    it.key to (it.value.average())
+
+                }.toMap()
+
+                addedEmotionsInCompositeAnalyticsState[emotion] = emotionTimeSeriesAverage
+
+                compositeAnalyticsModel.tryRunTransaction {
+
+
+                    lineSeries {
+                        addedEmotionsInCompositeAnalyticsState.forEach {
+                            series(
+                                    x = it.value.keys,
+                                    y = it.value.values
+                            )
+                        }
+//                        repeat(addedEmotionsInCompositeAnalyticsState.size) {
+//
+//                            series(
+//                                    x = addedEmotionsInCompositeAnalyticsState[it].keys,
+//                                    y = addedEmotionsInCompositeAnalyticsState[it].values
+//                            )
+//                        }
+                    }
+                }
+
+            }
+
+
+        }
     }
 
 

@@ -151,7 +151,7 @@ fun SingleEmotionAnalyticsScreen(
 
                                         selectedEmotion=emotions
                                         scope.lifecycleScope.launch {
-                                            viewModel.analyze(emotions)
+                                            viewModel.updateSingleEmotionAnalyticModelState(emotions)
                                         }
                                         isDropDownMenuExpanded=false
                                     }
