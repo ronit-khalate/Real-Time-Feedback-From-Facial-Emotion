@@ -36,7 +36,6 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
 import com.patrykandpatrick.vico.compose.cartesian.fullWidth
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineSpec
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberFadingEdges
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
@@ -44,11 +43,10 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.of
-import com.patrykandpatrick.vico.compose.common.shader.color
+import com.patrykandpatrick.vico.compose.common.rememberHorizontalLegend
 import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.common.Dimensions
-import com.patrykandpatrick.vico.core.common.shader.DynamicShader
 import com.patrykandpatrick.vico.core.common.shape.Shape
 import kotlinx.coroutines.launch
 
@@ -107,7 +105,7 @@ fun CompositeEmotionAnalyticsScreen(
 
                Row(
                        modifier = Modifier
-                           .padding(start = 20.dp , end = 20.dp)
+                           .padding(start = 20.dp, end = 20.dp)
                            .fillMaxSize()
                            .scrollable(state = scrollState, orientation = Orientation.Horizontal),
                        horizontalArrangement = Arrangement.SpaceEvenly,
@@ -138,7 +136,7 @@ fun CompositeEmotionAnalyticsScreen(
 
                         CompositeAnalyticsDropDownMenuItem(
                                 emotion = emotion.toString(),
-                                isAdded = false
+                                isAdded = viewModel.addedEmotionsInCompositeAnalyticsState.keys.contains(emotion)
                         ) {
 
                                 scope.launch {
@@ -221,15 +219,21 @@ fun CompositeEmotionAnalyticsScreen(
         CartesianChartHost(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(300.dp),
                 chart =
                 rememberCartesianChart(
-                        rememberLineCartesianLayer(
-                                lines = listOf(rememberLineSpec(shader = DynamicShader.color(Color.Red))),
 
-                                ),
-                        startAxis =
-                        rememberStartAxis(
+
+                        legend = rememberHorizontalLegend(
+                                items = viewModel.compositeAnalyticsChartLegends,
+                                iconSize = 10.dp,
+                                iconPadding = 20.dp,
+                                spacing = 10.dp
+                        ),
+                        layers = arrayOf(
+                                rememberLineCartesianLayer(lines = viewModel.compositeAnalyticsChartLineSpecs,)
+                        ),
+                        startAxis = rememberStartAxis(
                                 guideline = null,
                                 horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside,
                                 titleComponent =

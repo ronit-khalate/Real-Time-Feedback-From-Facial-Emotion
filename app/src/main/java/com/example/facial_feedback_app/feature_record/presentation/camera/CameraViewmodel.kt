@@ -4,9 +4,12 @@ import android.content.Context
 import android.util.Log
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.facial_feedback_app.feature_record.domain.BitmapTimeStampWrapper
@@ -18,11 +21,17 @@ import com.example.facial_feedback_app.feature_record.presentation.camera.state.
 import com.example.facial_feedback_app.feature_record.presentation.storage.state.SingleEmotionAnalyticsCharModels
 import com.example.facial_feedback_app.utils.MlKitFaceDetector
 import com.google.mlkit.vision.face.Face
+import com.patrykandpatrick.vico.compose.common.shader.color
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModel
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.ColumnCartesianLayerModel
 import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerModel
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
+import com.patrykandpatrick.vico.core.common.LegendItem
+import com.patrykandpatrick.vico.core.common.component.LineComponent
+import com.patrykandpatrick.vico.core.common.component.TextComponent
+import com.patrykandpatrick.vico.core.common.shader.DynamicShader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,10 +75,11 @@ class CameraViewModel @Inject constructor(
     // Composite Screen State
 
     var compositeAnalyticsModel = CartesianChartModelProducer.build()
-
-
     var addedEmotionsInCompositeAnalyticsState = mutableStateMapOf<Emotions,Map<Long,Double>>()
         private set
+
+    var compositeAnalyticsChartLegends = mutableStateListOf<LegendItem>()
+    var compositeAnalyticsChartLineSpecs = mutableStateListOf<LineCartesianLayer.LineSpec>()
 
 
 
@@ -192,10 +202,32 @@ class CameraViewModel @Inject constructor(
 
     suspend fun addEmotionDataInCompositeChart(emotion: Emotions) {
 
-        addedEmotionsInCompositeAnalyticsState?.let { it ->
 
 
-            if (!it.containsKey(emotion)) {
+            val charSequence :CharSequence = emotion.toString()
+            if (!addedEmotionsInCompositeAnalyticsState.keys.contains(emotion)) {
+
+                compositeAnalyticsChartLegends.add(
+                        LegendItem(
+                                icon = LineComponent(
+                                        color = emotion.color.toArgb(),
+
+                                ),
+                                labelText = charSequence,
+                                label = TextComponent.build {
+                                    this.color = Color.Black.toArgb()
+                                }
+
+                        )
+                )
+
+
+
+
+
+                compositeAnalyticsChartLineSpecs.add(
+                        LineCartesianLayer.LineSpec(shader = DynamicShader.color(emotion.color),)
+                )
 
 
                 val emotionTimeSeries: Map<Long, List<Float>> = dataAnalyzer.getEmotionTimeSeriesData(emotion)
@@ -218,20 +250,14 @@ class CameraViewModel @Inject constructor(
                                     y = it.value.values
                             )
                         }
-//                        repeat(addedEmotionsInCompositeAnalyticsState.size) {
-//
-//                            series(
-//                                    x = addedEmotionsInCompositeAnalyticsState[it].keys,
-//                                    y = addedEmotionsInCompositeAnalyticsState[it].values
-//                            )
-//                        }
+
                     }
                 }
 
             }
 
 
-        }
+
     }
 
 
