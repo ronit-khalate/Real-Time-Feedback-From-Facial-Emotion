@@ -79,6 +79,7 @@ class CameraViewModel @Inject constructor(
         private set
 
     var compositeAnalyticsChartLegends = mutableStateListOf<LegendItem>()
+
     var compositeAnalyticsChartLineSpecs = mutableStateListOf<LineCartesianLayer.LineSpec>()
 
 

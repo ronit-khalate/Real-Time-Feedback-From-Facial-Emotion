@@ -7,12 +7,13 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
@@ -103,18 +104,19 @@ fun CompositeEmotionAnalyticsScreen(
                         }
             ) {
 
-               Row(
+               LazyRow(
                        modifier = Modifier
                            .padding(start = 20.dp, end = 20.dp)
-                           .fillMaxSize()
-                           .scrollable(state = scrollState, orientation = Orientation.Horizontal),
+                           .fillMaxSize(),
                        horizontalArrangement = Arrangement.SpaceEvenly,
                        verticalAlignment = Alignment.CenterVertically
 
                ) {
-                   viewModel.addedEmotionsInCompositeAnalyticsState.forEach {
+
+                   items(viewModel.addedEmotionsInCompositeAnalyticsState.keys.toList()){
                        Text(text = it.toString())
                    }
+
                }
             }
 
@@ -231,7 +233,14 @@ fun CompositeEmotionAnalyticsScreen(
                                 spacing = 10.dp
                         ),
                         layers = arrayOf(
-                                rememberLineCartesianLayer(lines = viewModel.compositeAnalyticsChartLineSpecs,)
+                                rememberLineCartesianLayer(
+                                        lines = viewModel.compositeAnalyticsChartLineSpecs.map {
+
+                                            remember {
+                                                it
+                                            }
+                                        }
+                                )
                         ),
                         startAxis = rememberStartAxis(
                                 guideline = null,
