@@ -70,10 +70,7 @@ fun SingleEmotionAnalyticsScreen(
         mutableStateOf(false)
     }
 
-    var selectedEmotion by remember {
 
-        mutableStateOf(Emotions.HAPPY)
-    }
 
     val scope = LocalLifecycleOwner.current
 
@@ -120,7 +117,7 @@ fun SingleEmotionAnalyticsScreen(
                     Text(
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally),
-                            text = selectedEmotion.toString()
+                            text = viewModel.selectedEmotion.toString()
                     )
                 }
             }
@@ -149,7 +146,7 @@ fun SingleEmotionAnalyticsScreen(
 
                                     onClick = {
 
-                                        selectedEmotion=emotions
+                                        viewModel.changeEmotionDataInSingleEmotionAnalytic(emotions)
                                         scope.lifecycleScope.launch {
                                             viewModel.updateSingleEmotionAnalyticModelState(emotions)
                                         }

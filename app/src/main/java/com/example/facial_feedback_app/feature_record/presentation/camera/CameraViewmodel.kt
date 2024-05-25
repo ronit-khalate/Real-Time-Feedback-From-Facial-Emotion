@@ -71,6 +71,10 @@ class CameraViewModel @Inject constructor(
 
     var loading by mutableStateOf(false)
 
+    // Single Emotion Analytic Screen States
+    var selectedEmotion  by mutableStateOf(Emotions.HAPPY)
+
+
 
     // Composite Screen State
 
@@ -141,6 +145,11 @@ class CameraViewModel @Inject constructor(
 
         startTimeOfRecordingInSeconds=System.currentTimeMillis()
         camera.recordVideo(controller=controller, context = context)
+    }
+
+
+    fun changeEmotionDataInSingleEmotionAnalytic(emotion: Emotions){
+        selectedEmotion =emotion
     }
 
 
