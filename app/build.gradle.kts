@@ -124,8 +124,7 @@ dependencies {
     val vico_version = "2.0.0-alpha.15"
     implementation("com.patrykandpatrick.vico:compose-m3:$vico_version")
 
-    // Pie chart
-    implementation("ir.mahozad.android:pie-chart:0.7.0")
+
 
 
 

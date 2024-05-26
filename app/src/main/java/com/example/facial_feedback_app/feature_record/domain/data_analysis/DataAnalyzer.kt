@@ -28,6 +28,19 @@ class DataAnalyzer @Inject constructor(
 
     var frameCount =0;
 
+    val totalDataPoint:Int
+        get() {
+
+            var total=0
+            Emotions.values().forEach {
+                total += getEmotionTotalDataPoints(it)
+
+
+            }
+
+            return total
+        }
+
 
 
     // Time series Emotion collection
@@ -73,6 +86,18 @@ class DataAnalyzer @Inject constructor(
 
 
 
+    }
+
+    fun getEmotionTotalDataPoints(emotion: Emotions):Int{
+
+        var totalDataPoints=0;
+
+        getEmotionTimeSeriesData(emotion).forEach {
+
+            totalDataPoints += it.value.count()
+        }
+
+        return  totalDataPoints;
     }
 
 

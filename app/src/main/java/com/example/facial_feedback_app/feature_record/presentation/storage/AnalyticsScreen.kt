@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.facial_feedback_app.R
 import com.example.facial_feedback_app.feature_record.presentation.camera.CameraViewModel
+import com.example.facial_feedback_app.feature_record.presentation.storage.sections.AggregateResultScreen
 import com.example.facial_feedback_app.feature_record.presentation.storage.sections.CompositeEmotionAnalyticsScreen
 import com.example.facial_feedback_app.feature_record.presentation.storage.sections.SingleEmotionAnalyticsScreen
 
@@ -56,12 +57,23 @@ fun AnalyticsScreen(
         }
 
         IconButton(onClick = {
-            navController.navigate("Combined"){
+            navController.navigate("Compare"){
                 launchSingleTop=true
             }
         }) {
             Image(
-                    painter = painterResource(id = R.drawable.combined) ,
+                    painter = painterResource(id = R.drawable.compare) ,
+                    contentDescription =null
+            )
+        }
+
+        IconButton(onClick = {
+            navController.navigate("Aggregate"){
+                launchSingleTop=true
+            }
+        }) {
+            Image(
+                    painter = painterResource(id = R.drawable.aggregate) ,
                     contentDescription =null
             )
         }
@@ -82,8 +94,13 @@ fun AnalyticsScreen(
                 SingleEmotionAnalyticsScreen(viewModel = cameraViewModel)
             }
 
-            composable(route="Combined"){
+            composable(route="Compare"){
                 CompositeEmotionAnalyticsScreen(viewModel = cameraViewModel)
+            }
+
+            composable(route ="Aggregate"){
+                AggregateResultScreen(viewModel = cameraViewModel)
+
             }
         }
 

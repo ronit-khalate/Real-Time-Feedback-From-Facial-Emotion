@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,12 +12,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.yml.charts.common.model.PlotType
+import co.yml.charts.ui.piechart.models.PieChartData
 import com.example.facial_feedback_app.feature_record.domain.BitmapTimeStampWrapper
 import com.example.facial_feedback_app.feature_record.domain.Camera
 import com.example.facial_feedback_app.feature_record.domain.Emotions
 import com.example.facial_feedback_app.feature_record.domain.data_analysis.DataAnalyzer
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.CameraModeState
 import com.example.facial_feedback_app.feature_record.presentation.camera.state.RecordingState
+import com.example.facial_feedback_app.feature_record.presentation.storage.state.AggregateScreenEmotionSelectedState
 import com.example.facial_feedback_app.feature_record.presentation.storage.state.SingleEmotionAnalyticsCharModels
 import com.example.facial_feedback_app.utils.MlKitFaceDetector
 import com.google.mlkit.vision.face.Face
@@ -84,6 +88,28 @@ class CameraViewModel @Inject constructor(
     var compositeAnalyticsChartLegends = mutableStateMapOf<Emotions,LegendItem>()
 
     var compositeAnalyticsChartLineSpecs = mutableStateMapOf<Emotions,LineCartesianLayer.LineSpec>()
+
+
+    // Aggregate Screen States
+    var pieChartDataState by mutableStateOf(PieChartData(
+            slices = emptyList<PieChartData.Slice>(),
+            plotType = PlotType.Pie
+    ))
+
+    var aggregateEmotionSelectedState  = mutableMapOf<Emotions,AggregateScreenEmotionSelectedState>(
+            Emotions.HAPPY to AggregateScreenEmotionSelectedState.SelectedAsDefault,
+            Emotions.SAD to AggregateScreenEmotionSelectedState.SelectedAsDefault,
+            Emotions.FEAR to AggregateScreenEmotionSelectedState.SelectedAsDefault,
+            Emotions.ANGRY to AggregateScreenEmotionSelectedState.SelectedAsDefault,
+            Emotions.DISGUST to AggregateScreenEmotionSelectedState.SelectedAsDefault,
+            Emotions.NEUTRAL to AggregateScreenEmotionSelectedState.SelectedAsDefault,
+            Emotions.SURPRISE to AggregateScreenEmotionSelectedState.SelectedAsDefault,
+    )
+
+    var totalDataPointsToConsider:Float = dataAnalyzer.totalDataPoint.toFloat();
+    var totalPositiveDataPoints:Float by  mutableFloatStateOf(0f);
+    var totalNegativeDataPoints:Float by  mutableFloatStateOf(0f);
+    var totalDataPoints:Float by  mutableFloatStateOf(0f);
 
 
 
@@ -306,6 +332,65 @@ class CameraViewModel @Inject constructor(
 
             }
         }
+    }
+
+    fun onAggregateEmotionSelectedStateChanged(emotion: Emotions,state:AggregateScreenEmotionSelectedState){
+
+        aggregateEmotionSelectedState[emotion]= state
+
+        totalDataPoints=dataAnalyzer.totalDataPoint.toFloat()
+
+    }
+
+    fun aggregateResultShow(){
+
+
+
+        totalPositiveDataPoints=0f
+        totalNegativeDataPoints=0f
+        totalDataPointsToConsider=0f
+
+        aggregateEmotionSelectedState.forEach {
+
+                var dataPoints =0;
+
+                if(it.value is AggregateScreenEmotionSelectedState.SelectedAsPositive){
+                    dataPoints =dataAnalyzer.getEmotionTotalDataPoints(emotion = it.key)
+                    totalPositiveDataPoints+=dataPoints
+                    totalDataPointsToConsider +=dataPoints
+                }
+
+                if(it.value is AggregateScreenEmotionSelectedState.SelectedAsNegative) {
+                    dataPoints =dataAnalyzer.getEmotionTotalDataPoints(emotion = it.key)
+                    totalNegativeDataPoints+=dataPoints
+                    totalDataPointsToConsider +=dataPoints
+                }
+
+        }
+
+        val positive =(totalPositiveDataPoints/totalDataPointsToConsider)*100
+        val negative = (totalNegativeDataPoints/totalDataPointsToConsider)*100
+
+        pieChartDataState=pieChartDataState.copy(
+                slices =  listOf(
+                        PieChartData.Slice(
+                                label = "$positive %",
+                                color = Color(0xff9bf09d),
+                                value = positive,
+
+                                ),
+
+                        PieChartData.Slice(
+                                label = "$negative %",
+                                color = Color(0xfff68181),
+                                value =negative,
+                                sliceDescription = {
+                                it.toString()
+                            }
+                        )
+                )
+
+        )
     }
 
 
