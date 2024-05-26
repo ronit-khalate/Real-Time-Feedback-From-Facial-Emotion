@@ -37,7 +37,6 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
 import com.patrykandpatrick.vico.compose.cartesian.fullWidth
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineSpec
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberFadingEdges
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
@@ -243,15 +242,13 @@ fun CompositeEmotionAnalyticsScreen(
                         ),
                         layers = arrayOf(
                                 rememberLineCartesianLayer(
-                                        lines = viewModel.compositeAnalyticsChartLineSpecs.map {
+                                        lines = remember {
+                                            viewModel.compositeAnalyticsChartLineSpecs.map {
 
 
-                                            rememberLineSpec(
-                                                    shader = it.value.shader,
+                                                it.value
 
-                                            )
-
-
+                                            }
                                         }
                                 )
                         ),
