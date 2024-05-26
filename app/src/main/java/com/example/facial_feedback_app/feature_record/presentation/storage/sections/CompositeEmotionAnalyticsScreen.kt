@@ -37,6 +37,7 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
 import com.patrykandpatrick.vico.compose.cartesian.fullWidth
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineSpec
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberFadingEdges
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
@@ -139,12 +140,20 @@ fun CompositeEmotionAnalyticsScreen(
                         CompositeAnalyticsDropDownMenuItem(
                                 emotion = emotion.toString(),
                                 isAdded = viewModel.addedEmotionsInCompositeAnalyticsState.keys.contains(emotion)
-                        ) {
+                        ) {isAdded->
 
-                                scope.launch {
-
-                                    viewModel.addEmotionDataInCompositeChart(emotion)
+                                if(isAdded){
+                                    scope.launch {
+                                        viewModel.removeEmotionFromCompositeChart(emotion)
+                                    }
                                 }
+                                else{
+                                    scope.launch {
+
+                                        viewModel.addEmotionDataInCompositeChart(emotion)
+                                    }
+                                }
+
 
                         }
 
@@ -227,7 +236,7 @@ fun CompositeEmotionAnalyticsScreen(
 
 
                         legend = rememberHorizontalLegend(
-                                items = viewModel.compositeAnalyticsChartLegends,
+                                items = viewModel.compositeAnalyticsChartLegends.values,
                                 iconSize = 10.dp,
                                 iconPadding = 20.dp,
                                 spacing = 10.dp
@@ -236,9 +245,13 @@ fun CompositeEmotionAnalyticsScreen(
                                 rememberLineCartesianLayer(
                                         lines = viewModel.compositeAnalyticsChartLineSpecs.map {
 
-                                            remember {
-                                                it
-                                            }
+
+                                            rememberLineSpec(
+                                                    shader = it.value.shader,
+
+                                            )
+
+
                                         }
                                 )
                         ),

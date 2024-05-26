@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -82,9 +81,9 @@ class CameraViewModel @Inject constructor(
     var addedEmotionsInCompositeAnalyticsState = mutableStateMapOf<Emotions,Map<Long,Double>>()
         private set
 
-    var compositeAnalyticsChartLegends = mutableStateListOf<LegendItem>()
+    var compositeAnalyticsChartLegends = mutableStateMapOf<Emotions,LegendItem>()
 
-    var compositeAnalyticsChartLineSpecs = mutableStateListOf<LineCartesianLayer.LineSpec>()
+    var compositeAnalyticsChartLineSpecs = mutableStateMapOf<Emotions,LineCartesianLayer.LineSpec>()
 
 
 
@@ -217,8 +216,7 @@ class CameraViewModel @Inject constructor(
             val charSequence :CharSequence = emotion.toString()
             if (!addedEmotionsInCompositeAnalyticsState.keys.contains(emotion)) {
 
-                compositeAnalyticsChartLegends.add(
-                        LegendItem(
+                compositeAnalyticsChartLegends[emotion] = LegendItem(
                                 icon = LineComponent(
                                         color = emotion.color.toArgb(),
 
@@ -228,16 +226,14 @@ class CameraViewModel @Inject constructor(
                                     this.color = Color.Black.toArgb()
                                 }
 
-                        )
+
                 )
 
 
 
 
+                compositeAnalyticsChartLineSpecs[emotion] =LineCartesianLayer.LineSpec(shader = DynamicShader.color(emotion.color),)
 
-                compositeAnalyticsChartLineSpecs.add(
-                        LineCartesianLayer.LineSpec(shader = DynamicShader.color(emotion.color),)
-                )
 
 
                 val emotionTimeSeries: Map<Long, List<Float>> = dataAnalyzer.getEmotionTimeSeriesData(emotion)
@@ -268,6 +264,48 @@ class CameraViewModel @Inject constructor(
 
 
 
+    }
+
+
+    suspend fun removeEmotionFromCompositeChart(emotion: Emotions){
+
+
+        if(addedEmotionsInCompositeAnalyticsState.keys.contains(emotion)){
+
+           compositeAnalyticsChartLegends.remove(emotion)
+
+            compositeAnalyticsChartLineSpecs.remove(emotion)
+
+
+            addedEmotionsInCompositeAnalyticsState.remove(emotion)
+
+
+        }
+
+
+
+        compositeAnalyticsModel.tryRunTransaction {
+
+
+            lineSeries {
+
+                if(addedEmotionsInCompositeAnalyticsState.isEmpty()){
+
+
+                    addedEmotionsInCompositeAnalyticsState.forEach {
+                        series(
+                                x = it.value.keys,
+                                y = it.value.values
+                        )
+                    }
+                }
+                else{
+
+                    series()
+                }
+
+            }
+        }
     }
 
 

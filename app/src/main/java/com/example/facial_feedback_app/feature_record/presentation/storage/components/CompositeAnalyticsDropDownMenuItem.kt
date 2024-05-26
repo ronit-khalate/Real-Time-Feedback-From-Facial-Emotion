@@ -19,7 +19,7 @@ fun CompositeAnalyticsDropDownMenuItem(
     modifier: Modifier = Modifier,
     emotion:String,
     isAdded:Boolean=false,
-    onClick:()->Unit
+    onClick:(Boolean)->Unit
 ) {
 
 
@@ -29,7 +29,7 @@ fun CompositeAnalyticsDropDownMenuItem(
                 .fillMaxWidth()
                 .height(70.dp)
                 .clickable {
-                    onClick()
+                    onClick(isAdded)
                 },
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
