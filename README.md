@@ -7,6 +7,7 @@ https://drive.google.com/file/d/1vWR4a_TauCukLDYATxG3VPDyDkD2omIm/view?usp=shari
 
 <div align="center">
 <h1>Capturing Video</h1>
+ <p>Capture video of the customer while they interact with our products and services to observe their emotions during the interaction.</p>
 </div>
 
 <p float="left">
