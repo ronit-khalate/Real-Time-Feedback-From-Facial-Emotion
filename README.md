@@ -12,32 +12,30 @@ An Android application designed to capture and analyze facial expressions in rea
 ### 1. Real-Time Video Capture
 Capture video of users while they interact with products or services. The app utilizes CameraX and ML Kit to detect faces and analyze emotions on the fly.
 
-| | |
-|---|---|
-| <img src="ui_images/capture_video_1.png" width="300"> | <img src="ui_images/capture_video_2.png" width="300"> |
+| Capture Video  | 
+|:---:|
+| <img src="ui_images/capture_video_1.png" width="150">  <img src="ui_images/capture_video_2.png" width="150"> |
 
 ### 2. Single Emotion Analysis
 Detailed representation of data for a specific emotion. Choose an emotion to see its frequency and intensity over time.
 
-| | |
-|---|---|
-| <img src="ui_images/single_emotion_choose.jpg" width="200"> | <img src="ui_images/single_data_1.jpg" width="200"> |
-| <img src="ui_images/single_data_2.jpg" width="200"> | <img src="ui_images/single_data_3.jpg" width="200"> |
+| Select single emotion| Happy emotion|Fear emotion | Disgust emotion|
+|---|---|---|---|
+| <img src="ui_images/single_emotion_choose.jpg" width="150"> | <img src="ui_images/single_data_1.jpg" width="150"> | <img src="ui_images/single_data_2.jpg" width="150"> | <img src="ui_images/single_data_3.jpg" width="150"> |
 
 ### 3. Emotion Comparison
 Compare multiple emotions side-by-side to understand the transition and dominance of different facial expressions during an interaction.
 
-| | |
-|---|---|
-| <img src="ui_images/compare_data_choose.jpg" width="200"> | <img src="ui_images/compare_data_1.jpg" width="200"> |
-| <img src="ui_images/compare_data_2.jpg" width="200"> | <img src="ui_images/compare_data_3.jpg" width="200"> |
+| Select emotions from list| Happy emotion only|Disgust and Happy emotions |Disgust, Happy and Surprise emotions |
+|---|---|---|---|
+| <img src="ui_images/compare_data_choose.jpg" width="150"> | <img src="ui_images/compare_data_1.jpg" width="150"> | <img src="ui_images/compare_data_2.jpg" width="150"> | <img src="ui_images/compare_data_3.jpg" width="150"> |
 
 ### 4. Aggregate Probability Data
 Visualize the aggregate probability of all detected emotions to get an overall sentiment score.
 
 | | |
 |---|---|
-| <img src="ui_images/aggregate_data_1.jpg" width="300"> | <img src="ui_images/aggregate_data_2.jpg" width="300"> |
+| <img src="ui_images/aggregate_data_1.jpg" width="150"> | <img src="ui_images/aggregate_data_2.jpg" width="150"> |
 
 ---
 
@@ -63,5 +61,3 @@ Visualize the aggregate probability of all detected emotions to get an overall s
 3. Build and run the app on an Android device (API 27+).
 
 ---
-
-© 2024 Facial Emotion Feedback Team
