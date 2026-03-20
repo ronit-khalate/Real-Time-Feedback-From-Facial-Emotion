@@ -1,61 +1,67 @@
-<div align="center">
-<h1>Project Demo</h1>
-https://drive.google.com/file/d/1vWR4a_TauCukLDYATxG3VPDyDkD2omIm/view?usp=sharing
-</div>
+# Real-Time Facial Emotion Feedback App
 
-<br>
+An Android application designed to capture and analyze facial expressions in real-time to provide emotional feedback. This tool is ideal for observing customer interactions and visualizing emotional data through intuitive charts and graphs.
 
-<div align="center">
-<h1>Capturing Video</h1>
- <p>Capture video of the customer while they interact with our products and services to observe their emotions during the interaction.</p>
-</div>
+## 📺 Project Demo
+[Watch the Demo Video](https://drive.google.com/file/d/1vWR4a_TauCukLDYATxG3VPDyDkD2omIm/view?usp=sharing)
 
-<p float="left">
- <img src="ui_images/capture_video_1.png" alt="Feature 1" width="200"/>
-  &nbsp;&nbsp;&nbsp;&nbsp;
-   <img src="ui_images/capture_video_2.png" alt="Feature 2" width="200"/>
-  &nbsp;&nbsp;&nbsp;&nbsp;
-</p>
+---
 
-<br>
-<div align="center">
-  <h1>Single Emotion Wise Data Representation</h1>
-</div>
+## 🚀 Features
 
-<p float="left">
-   <img src="ui_images/single_emotion_choose.jpg" alt="Feature 1" width="200"/>
-    &nbsp;&nbsp;&nbsp;&nbsp;
-   <img src="ui_images/single_data_1.jpg" alt="Feature 2" width="200"/>
-    &nbsp;&nbsp;&nbsp;&nbsp;
-   <img src="ui_images/single_data_2.jpg" alt="Feature 2" width="200"/>
-     &nbsp;&nbsp;&nbsp;&nbsp;
-   <img src="ui_images/single_data_3.jpg" alt="Feature 2" width="200"/>
-</p>
+### 1. Real-Time Video Capture
+Capture video of users while they interact with products or services. The app utilizes CameraX and ML Kit to detect faces and analyze emotions on the fly.
 
-<br>
+| | |
+|---|---|
+| <img src="ui_images/capture_video_1.png" width="300"> | <img src="ui_images/capture_video_2.png" width="300"> |
 
-<div align="center">
-  <h1>Compare Multiple Emotion Data</h1>
-</div>
+### 2. Single Emotion Analysis
+Detailed representation of data for a specific emotion. Choose an emotion to see its frequency and intensity over time.
 
-<p float="left">
-   <img src="ui_images/compare_data_choose.jpg" alt="Feature 1" width="200"/>
-    &nbsp;&nbsp;&nbsp;&nbsp;
-   <img src="ui_images/compare_data_1.jpg" alt="Feature 2" width="200"/>
-    &nbsp;&nbsp;&nbsp;&nbsp;
-   <img src="ui_images/compare_data_2.jpg" alt="Feature 2" width="200"/>
-    &nbsp;&nbsp;&nbsp;&nbsp;
-   <img src="ui_images/compare_data_3.jpg" alt="Feature 2" width="200"/>
-</p>
+| | |
+|---|---|
+| <img src="ui_images/single_emotion_choose.jpg" width="200"> | <img src="ui_images/single_data_1.jpg" width="200"> |
+| <img src="ui_images/single_data_2.jpg" width="200"> | <img src="ui_images/single_data_3.jpg" width="200"> |
 
-<br>
+### 3. Emotion Comparison
+Compare multiple emotions side-by-side to understand the transition and dominance of different facial expressions during an interaction.
 
-<div align="center">
-  <h1>Aggregate Multiple Emotion Data Into Probability</h1>
-</div>
-<p float="left">
-   <img src="ui_images/aggregate_data_1.jpg" alt="Feature 1" width="200"/>
-    &nbsp;&nbsp;&nbsp;&nbsp;
-   <img src="ui_images/aggregate_data_2.jpg" alt="Feature 2" width="200"/>
+| | |
+|---|---|
+| <img src="ui_images/compare_data_choose.jpg" width="200"> | <img src="ui_images/compare_data_1.jpg" width="200"> |
+| <img src="ui_images/compare_data_2.jpg" width="200"> | <img src="ui_images/compare_data_3.jpg" width="200"> |
 
-</p>
+### 4. Aggregate Probability Data
+Visualize the aggregate probability of all detected emotions to get an overall sentiment score.
+
+| | |
+|---|---|
+| <img src="ui_images/aggregate_data_1.jpg" width="300"> | <img src="ui_images/aggregate_data_2.jpg" width="300"> |
+
+---
+
+## 🛠 Tech Stack
+
+- **UI:** Jetpack Compose
+- **Camera:** CameraX
+- **ML/AI:** 
+    - Google ML Kit (Face Detection)
+    - TensorFlow Lite (Emotion Classification)
+- **Dependency Injection:** Dagger Hilt
+- **Data Visualization:** 
+    - Vico Charts
+    - YCharts
+- **Architecture:** MVVM (Model-View-ViewModel)
+
+---
+
+## ⚙️ Installation
+
+1. Clone the repository.
+2. Open the project in Android Studio (Iguana or newer recommended).
+3. Build and run the app on an Android device (API 27+).
+
+---
+
+© 2024 Facial Emotion Feedback Team
